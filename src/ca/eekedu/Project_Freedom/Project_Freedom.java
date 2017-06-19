@@ -1,3 +1,4 @@
+package ca.eekedu.Project_Freedom;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
@@ -5,6 +6,8 @@ import javax.swing.JWindow;
 
 public class Project_Freedom extends JWindow{
 	
+	private static final long serialVersionUID = -2787039850560314750L;
+
 	static Project_Freedom mainGame = null;
 	
 	int RESOLUTION_WIDTH = 1080;
