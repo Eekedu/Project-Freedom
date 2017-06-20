@@ -4,13 +4,13 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import javax.swing.JWindow;
+import javax.swing.JFrame;
 
-public class MainGame extends JWindow{
+public class MainGame extends JFrame{
 	
 	private static final long serialVersionUID = -2787039850560314750L;
 
-	static MainGame mainGame = null;
+	public static MainGame mainGame = null;
 	static GraphicsGame graphics = new GraphicsGame();
 	
 	int RESOLUTION_WIDTH = 1080;
@@ -22,27 +22,21 @@ public class MainGame extends JWindow{
 		positionWindowAndSize();
 		
 		setName("Project Freedom");
+		setUndecorated(true);
 		setOpacity(0.75F);
 		addKeyListener(new KeyListener() {
 			
-			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			public void keyReleased(KeyEvent e) {
-				
-				
-			}
-			
+			public void keyTyped(KeyEvent e) {}
+			public void keyReleased(KeyEvent e) {}
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
-					System.out.println("YESH");
 					setVisible(false);
+					dispose();
 				}
-				
 			}
 		});
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
 		add(graphics);
 		setVisible(true);
 	}
