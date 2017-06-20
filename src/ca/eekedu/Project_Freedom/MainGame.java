@@ -9,8 +9,7 @@ import java.awt.event.KeyListener;
 import java.util.HashMap;
 import java.util.Map;
 
-
-import javax.swing.JFrame;
+import javax.swing.*;
 
 public class MainGame extends JFrame{
 	
@@ -72,11 +71,11 @@ public class MainGame extends JFrame{
 			}
 		});
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setBackground(new Color(255,255,255,0));
-		add(graphics);
+		setContentPane(graphics);
+		setBackground(new Color(0,0,0,0));
 		setVisible(true);
 		
-		ActionListener firstTim = new ActionListener() {
+		/*ActionListener firstTim = new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
 				remove(graphics);
@@ -91,10 +90,19 @@ public class MainGame extends JFrame{
 			}
 		};
 		
+		Timer tim = new Timer(1000, firstTim);
+		tim.setInitialDelay(900);
+		Timer tim2 = new Timer(1000, secondTim);
+		tim.start();
+		tim2.start();*/
 		
 		while (enabled){
+			
 			graphics.update();
+			
 		}
+		/*tim.stop();
+		tim2.stop();*/
 	}
 	
 	public void positionWindowAndSize(){
