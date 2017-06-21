@@ -1,9 +1,6 @@
 package ca.eekedu.Project_Freedom;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashMap;
@@ -17,7 +14,7 @@ public class MainGame extends JFrame{
 
 	public static MainGame mainGame = null;
 	public static GraphicsGame graphics = new GraphicsGame();
-	public boolean enabled = true;
+	public static boolean enabled = true;
 	
 	Map<Integer, Integer> keysPressed = new HashMap<Integer, Integer>();
 	
@@ -26,11 +23,13 @@ public class MainGame extends JFrame{
 	static int SYSTEM_RES_WIDTH = 0;
 	static int SYSTEM_RES_HEIGHT = 0;
 	
-	MainGame(){
+		MainGame(){
 		positionWindowAndSize();
 		
 		setTitle("Project Freedom");
 		setUndecorated(true);
+		setOpacity(1F);
+		
 		addKeyListener(new KeyListener() {
 			
 			public void keyTyped(KeyEvent e) {}
@@ -70,39 +69,12 @@ public class MainGame extends JFrame{
 				}
 			}
 		});
+		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setContentPane(graphics);
-		setBackground(new Color(0,0,0,0));
+		//setLayout(null);
+		add(graphics);
 		setVisible(true);
 		
-		/*ActionListener firstTim = new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				remove(graphics);
-			}
-		};
-		
-		ActionListener secondTim = new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				add(graphics);
-				
-			}
-		};
-		
-		Timer tim = new Timer(1000, firstTim);
-		tim.setInitialDelay(900);
-		Timer tim2 = new Timer(1000, secondTim);
-		tim.start();
-		tim2.start();*/
-		
-		while (enabled){
-			
-			graphics.update();
-			
-		}
-		/*tim.stop();
-		tim2.stop();*/
 	}
 	
 	public void positionWindowAndSize(){
@@ -119,6 +91,12 @@ public class MainGame extends JFrame{
 		SYSTEM_RES_WIDTH = system_resolution.width;
 		SYSTEM_RES_HEIGHT = system_resolution.height;
 		mainGame = new MainGame();
+		
+		while (enabled){
+			
+			graphics.update();
+			
+		}
 
 	}
 	
