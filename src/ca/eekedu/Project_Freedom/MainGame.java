@@ -1,6 +1,8 @@
 package ca.eekedu.Project_Freedom;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashMap;
@@ -14,21 +16,23 @@ public class MainGame extends JFrame{
 
 	public static MainGame mainGame = null;
 	public static GraphicsGame graphics = new GraphicsGame();
-	public static boolean enabled = true;
 	
 	Map<Integer, Integer> keysPressed = new HashMap<Integer, Integer>();
+	static Timer update = new Timer(0, null);
 	
 	static int RESOLUTION_WIDTH = 1080;
 	static int RESOLUTION_HEIGHT = 720;
 	static int SYSTEM_RES_WIDTH = 0;
 	static int SYSTEM_RES_HEIGHT = 0;
 	
-		MainGame(){
-		positionWindowAndSize();
+	public enum GAMEMODE { Game, Draw }
+	public static GAMEMODE mode = GAMEMODE.Game;
+	MainGame(){
 		
 		setTitle("Project Freedom");
 		setUndecorated(true);
 		setOpacity(1F);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
 		addKeyListener(new KeyListener() {
 			
@@ -45,8 +49,8 @@ public class MainGame extends JFrame{
 					keysPressed.put(e.getKeyCode(), 0);
 				}
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
+					update.stop();
 					dispose();
-					enabled = false;
 				}else if ( keysPressed.containsKey(new Integer(KeyEvent.VK_SHIFT))){
 					if (e.getKeyCode() == KeyEvent.VK_UP){
 						RESOLUTION_WIDTH = 1280;
@@ -70,10 +74,10 @@ public class MainGame extends JFrame{
 			}
 		});
 		
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		//setLayout(null);
 		add(graphics);
 		setVisible(true);
+		positionWindowAndSize();
 		
 	}
 	
@@ -92,12 +96,20 @@ public class MainGame extends JFrame{
 		SYSTEM_RES_HEIGHT = system_resolution.height;
 		mainGame = new MainGame();
 		
-		while (enabled){
+		ActionListener updateTimer = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				graphics.update();
+			}
+		};
+		
+		update = new Timer(5, updateTimer); //Smooth update of graphics, reduced lag
+		update.start();
+		
+		while (update.isRunning()){
 			
-			graphics.update();
 			
 		}
-
+		
 	}
 	
 
