@@ -16,8 +16,11 @@ public class DrawingFrame extends JFrame{
 	
 	private static final long serialVersionUID = 1644654621927813840L;
 	
-	public int mouseX = 0; int mouseY = 0;
-
+	public static int mouseX = 0; static int mouseY = 0;
+	public static boolean pressed = false;
+	
+	public GraphicsDrawing draw = new GraphicsDrawing();
+	
 	DrawingFrame (int width, int height){
 		setTitle("Drawing Frame");
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -26,7 +29,6 @@ public class DrawingFrame extends JFrame{
 		setSize(width, height);
 		setLocation(0, 0);
 		setBackground(new Color(255, 255, 255, 0));
-		GraphicsDrawing draw = new GraphicsDrawing();
 		add(draw);
 		setVisible(true);
 		
@@ -50,9 +52,11 @@ public class DrawingFrame extends JFrame{
 		
 		addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent e) {
-					
+				pressed = false;
 			}
-			public void mousePressed(MouseEvent e) {}
+			public void mousePressed(MouseEvent e) {
+				pressed = true;
+			}
 			public void mouseExited(MouseEvent e) {}
 			public void mouseEntered(MouseEvent e) {}
 			public void mouseClicked(MouseEvent e) {}

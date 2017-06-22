@@ -111,6 +111,8 @@ public class MainGame extends JFrame{
 				if (draw != null){
 					if (!draw.isVisible()){
 						draw = null;
+					} else {
+						draw.draw.update();
 					}
 				}
 			}
