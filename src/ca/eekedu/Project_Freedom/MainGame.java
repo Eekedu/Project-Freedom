@@ -1,5 +1,7 @@
 package ca.eekedu.Project_Freedom;
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +26,8 @@ public class MainGame extends JFrame{
 	static int RESOLUTION_HEIGHT = 720;
 	static int SYSTEM_RES_WIDTH = 0;
 	static int SYSTEM_RES_HEIGHT = 0;
+	static int SYSTEM_MAXDRAW_WIDTH = 0;
+	static int SYSTEM_MAXDRAW_HEIGHT = 0;
 	
 	public enum GAMEMODE { Game, Draw }
 	public static GAMEMODE mode = GAMEMODE.Game;
@@ -31,7 +35,6 @@ public class MainGame extends JFrame{
 		
 		setTitle("Project Freedom");
 		setUndecorated(true);
-		setOpacity(1F);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
 		addKeyListener(new KeyListener() {
@@ -70,6 +73,9 @@ public class MainGame extends JFrame{
 					graphics.x-=10;
 				}  else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
 					graphics.x+=10;
+				} else if (e.getKeyCode() == KeyEvent.VK_SPACE){
+					DrawingFrame draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
+					mode = GAMEMODE.Draw;
 				}
 			}
 		});
@@ -94,6 +100,9 @@ public class MainGame extends JFrame{
 		Dimension system_resolution = Toolkit.getDefaultToolkit().getScreenSize();
 		SYSTEM_RES_WIDTH = system_resolution.width;
 		SYSTEM_RES_HEIGHT = system_resolution.height;
+		Rectangle window = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		SYSTEM_MAXDRAW_WIDTH = window.width;
+		SYSTEM_MAXDRAW_HEIGHT = window.height;
 		mainGame = new MainGame();
 		
 		ActionListener updateTimer = new ActionListener() {
