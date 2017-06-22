@@ -31,6 +31,11 @@ public class GraphicsGame extends JPanel {
 		g2.fillRoundRect(x, y, 100, 100, 25, 25);
 		g2.setColor(new Color(0, 0, 0));
 		g2.drawString("Mode: " + ((MainGame.mode == MainGame.GAMEMODE.Game)? "Game" : "Draw"), 1, 19);
+		if (MainGame.mode == MainGame.GAMEMODE.Draw){
+			try {
+				g2.drawString("Mouse: (" + MainGame.draw.mouseX + "," + MainGame.draw.mouseY + ")", 200, 19);
+			} catch (NullPointerException e){}
+		}
 		
 	}
 

@@ -31,6 +31,7 @@ public class MainGame extends JFrame{
 	
 	public enum GAMEMODE { Game, Draw }
 	public static GAMEMODE mode = GAMEMODE.Game;
+	public static DrawingFrame draw = null;
 	MainGame(){
 		
 		setTitle("Project Freedom");
@@ -64,23 +65,22 @@ public class MainGame extends JFrame{
 						RESOLUTION_HEIGHT = 720;
 						positionWindowAndSize();
 					}
-				}  else if (e.getKeyCode() == KeyEvent.VK_UP){
+				}  else if (e.getKeyCode() == KeyEvent.VK_W){
 					graphics.y-=10;
-				}  else if (e.getKeyCode() == KeyEvent.VK_DOWN){
+				}  else if (e.getKeyCode() == KeyEvent.VK_S){
 					graphics.y+=10;
 				}
-				if (e.getKeyCode() == KeyEvent.VK_LEFT){
+				if (e.getKeyCode() == KeyEvent.VK_A){
 					graphics.x-=10;
-				}  else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+				}  else if (e.getKeyCode() == KeyEvent.VK_D){
 					graphics.x+=10;
 				} else if (e.getKeyCode() == KeyEvent.VK_SPACE){
-					DrawingFrame draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
+					draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
 					mode = GAMEMODE.Draw;
 				}
 			}
 		});
 		
-		//setLayout(null);
 		add(graphics);
 		setVisible(true);
 		positionWindowAndSize();
@@ -108,15 +108,18 @@ public class MainGame extends JFrame{
 		ActionListener updateTimer = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				graphics.update();
+				if (draw != null){
+					if (!draw.isVisible()){
+						draw = null;
+					}
+				}
 			}
 		};
 		
 		update = new Timer(5, updateTimer); //Smooth update of graphics, reduced lag
 		update.start();
 		
-		while (update.isRunning()){
-			
-			
+		while (update.isRunning() || draw != null){
 		}
 		
 	}
