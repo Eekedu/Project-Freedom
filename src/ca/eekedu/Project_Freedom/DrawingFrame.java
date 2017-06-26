@@ -79,8 +79,8 @@ public class DrawingFrame extends JFrame{
 					dispose();
 				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT){
 					pressed = true;
-					mousePos();
 					startX = mouseX; startY = mouseY;
+					mousePos();
 				}
 			}
 		});
@@ -96,8 +96,8 @@ public class DrawingFrame extends JFrame{
 			}
 			public void mousePressed(MouseEvent e) {
 				pressed = true;
-				mousePos();
 				startX = mouseX; startY = mouseY;
+				mousePos();
 			}
 			public void mouseExited(MouseEvent e) {}
 			public void mouseEntered(MouseEvent e) {}
