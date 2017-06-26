@@ -62,12 +62,25 @@ public class DrawingFrame extends JFrame{
 		
 		addKeyListener(new KeyListener() {
 			public void keyTyped(KeyEvent e) {}
-			public void keyReleased(KeyEvent e) {}
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_SHIFT){
+					pressed = false;
+					mousePos();
+					dir = DIRECTION.None;
+					MainGame.dHelper.setLocation(1, 1);
+					MainGame.dHelper.setSize(1, 1);
+					doDraw = true;
+				}
+			}
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
 					MainGame.dHelper.dispose();
 					MainGame.mode = MainGame.GAMEMODE.Game;
 					dispose();
+				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT){
+					pressed = true;
+					mousePos();
+					startX = mouseX; startY = mouseY;
 				}
 			}
 		});
