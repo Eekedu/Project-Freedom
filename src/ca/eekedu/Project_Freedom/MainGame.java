@@ -19,7 +19,7 @@ public class MainGame extends JFrame{
 	public static MainGame mainGame = null;
 	public static GraphicsGame graphics = new GraphicsGame();
 	
-	Map<Integer, Integer> keysPressed = new HashMap<Integer, Integer>();
+	public static Map<Integer, Integer> keysPressed = new HashMap<Integer, Integer>();
 	static Timer update = new Timer(0, null);
 	
 	static int RESOLUTION_WIDTH = 1080;
@@ -46,6 +46,11 @@ public class MainGame extends JFrame{
 					if (keysPressed.containsKey(e.getKeyCode())){
 						keysPressed.remove(e.getKeyCode(), 0);
 					}
+				} else if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_S ||
+						e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D){
+					if (keysPressed.containsKey(e.getKeyCode())){
+						keysPressed.remove(e.getKeyCode(), 0);
+					}
 				}
 			}
 			public void keyPressed(KeyEvent e) {
@@ -65,15 +70,10 @@ public class MainGame extends JFrame{
 						RESOLUTION_HEIGHT = 720;
 						positionWindowAndSize();
 					}
-				}  else if (e.getKeyCode() == KeyEvent.VK_W){
-					graphics.y-=10;
-				}  else if (e.getKeyCode() == KeyEvent.VK_S){
-					graphics.y+=10;
 				}
-				if (e.getKeyCode() == KeyEvent.VK_A){
-					graphics.x-=10;
-				}  else if (e.getKeyCode() == KeyEvent.VK_D){
-					graphics.x+=10;
+				if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_S ||
+						e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D){
+					keysPressed.put(e.getKeyCode(), 0);
 				} else if (e.getKeyCode() == KeyEvent.VK_SPACE){
 					draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
 					mode = GAMEMODE.Draw;
@@ -115,6 +115,7 @@ public class MainGame extends JFrame{
 						draw.draw.update();
 					}
 				}
+				checkControls();
 			}
 		};
 		
@@ -126,5 +127,13 @@ public class MainGame extends JFrame{
 		
 	}
 	
+	public static void checkControls(){
+		for (Integer key: keysPressed.keySet()){
+			if (key == KeyEvent.VK_W) graphics.y--;
+			if (key == KeyEvent.VK_S) graphics.y++;
+			if (key == KeyEvent.VK_A) graphics.x--;
+			if (key == KeyEvent.VK_D) graphics.x++;
+		}
+	}
 
 }
