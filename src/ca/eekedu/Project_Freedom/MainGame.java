@@ -30,8 +30,11 @@ public class MainGame extends JFrame{
 	static int SYSTEM_MAXDRAW_HEIGHT = 0;
 	
 	public enum GAMEMODE { Game, Draw }
+	public enum DRAWMODE { Line, EmptyRect, FilledRect }
 	public static GAMEMODE mode = GAMEMODE.Game;
+	public static DRAWMODE d_mode = DRAWMODE.Line;
 	public static DrawingFrame draw = null;
+	public static DrawHelperFrame dHelper = null;
 	MainGame(){
 		
 		setTitle("Project Freedom");
@@ -75,6 +78,7 @@ public class MainGame extends JFrame{
 						e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D){
 					keysPressed.put(e.getKeyCode(), 0);
 				} else if (e.getKeyCode() == KeyEvent.VK_SPACE){
+					dHelper = new DrawHelperFrame();
 					draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
 					mode = GAMEMODE.Draw;
 				}
@@ -110,9 +114,10 @@ public class MainGame extends JFrame{
 				graphics.update();
 				if (draw != null){
 					if (!draw.isVisible()){
+						dHelper = null;
 						draw = null;
 					} else {
-						draw.draw.update();
+						DrawingFrame.draw.update();
 					}
 				}
 				checkControls();
@@ -122,7 +127,7 @@ public class MainGame extends JFrame{
 		update = new Timer(5, updateTimer); //Smooth update of graphics, reduced lag
 		update.start();
 		
-		while (update.isRunning() || draw != null){
+		while (update.isRunning() || draw != null || dHelper != null){
 		}
 		
 	}
