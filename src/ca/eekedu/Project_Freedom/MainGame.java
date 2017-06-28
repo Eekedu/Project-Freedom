@@ -105,7 +105,6 @@ public class MainGame extends JFrame{
 		setLocation(posX, posY);
 	}
 	
-
 	public static void main(String[] args) {
 		Dimension system_resolution = Toolkit.getDefaultToolkit().getScreenSize();
 		SYSTEM_RES_WIDTH = system_resolution.width;
