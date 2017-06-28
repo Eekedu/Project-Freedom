@@ -1,4 +1,5 @@
 package ca.eekedu.Project_Freedom;
+import static ca.eekedu.Project_Freedom.MainGame.*;
 
 import java.awt.Color;
 import java.awt.MouseInfo;
@@ -46,7 +47,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 		
 		addWindowListener(new WindowAdapter() {
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-		    	MainGame.mode = MainGame.GAMEMODE.Game;
+		    	mode = GAMEMODE.Game;
 		    	dispose();
 		    }
 		});
@@ -54,9 +55,9 @@ public class DrawingFrame extends JFrame implements Runnable{
 		addWindowFocusListener(new WindowFocusListener() {
 			
 			public void windowLostFocus(WindowEvent e) {
-				MainGame.mainGame.toFront();
-				if (MainGame.dHelper != null){
-					MainGame.dHelper.toFront();
+				mainGame.toFront();
+				if (dHelper != null){
+					dHelper.toFront();
 					toFront();
 				}
 			}
@@ -70,30 +71,30 @@ public class DrawingFrame extends JFrame implements Runnable{
 					pressed = false;
 					mousePos();
 					dir = DIRECTION.None;
-					MainGame.dHelper.setLocation(1, 1);
-					MainGame.dHelper.setSize(1, 1);
+					dHelper.setLocation(1, 1);
+					dHelper.setSize(1, 1);
 					doDraw = true;
 				}
 			}
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
-					MainGame.dHelper.dispose();
-					MainGame.mode = MainGame.GAMEMODE.Game;
+					dHelper.dispose();
+					mode = GAMEMODE.Game;
 					dispose();
 				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT){
 					pressed = true;
 					startX = mouseX; startY = mouseY;
 					mousePos();
 				} else if (e.getKeyCode() == KeyEvent.VK_C){
-					Color prevColor = MainGame.drawColor;
-					MainGame.drawColor = JColorChooser.showDialog(DrawingFrame.this, "Choose drawing color", MainGame.drawColor);
-					if (MainGame.drawColor == null){
-						MainGame.drawColor = prevColor;
+					Color prevColor = drawColor;
+					drawColor = JColorChooser.showDialog(DrawingFrame.this, "Choose drawing color", drawColor);
+					if (drawColor == null){
+						drawColor = prevColor;
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_ADD){
-					MainGame.drawColor = MainGame.drawColor.brighter();
+					drawColor = drawColor.brighter();
 				}  else if (e.getKeyCode() == KeyEvent.VK_SUBTRACT){
-					MainGame.drawColor = MainGame.drawColor.darker();
+					drawColor = drawColor.darker();
 				}
 			}
 		});
@@ -103,8 +104,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 				pressed = false;
 				mousePos();
 				dir = DIRECTION.None;
-				MainGame.dHelper.setLocation(1, 1);
-				MainGame.dHelper.setSize(1, 1);
+				dHelper.setLocation(1, 1);
+				dHelper.setSize(1, 1);
 				doDraw = true;
 			}
 			public void mousePressed(MouseEvent e) {
@@ -152,28 +153,28 @@ public class DrawingFrame extends JFrame implements Runnable{
 			if (dir != DIRECTION.None){
 				switch (dir){
 					case NE: {
-						MainGame.dHelper.setLocation(startX, mouseY);
-						MainGame.dHelper.setSize(mouseX - startX, startY - mouseY);
+						dHelper.setLocation(startX, mouseY);
+						dHelper.setSize(mouseX - startX, startY - mouseY);
 						break;
 					}
 					case NW: {
-						MainGame.dHelper.setLocation(mouseX, mouseY);
-						MainGame.dHelper.setSize(startX - mouseX, startY - mouseY);
+						dHelper.setLocation(mouseX, mouseY);
+						dHelper.setSize(startX - mouseX, startY - mouseY);
 						break;
 					}
 					case SE: {
-						MainGame.dHelper.setLocation(startX, startY);
-						MainGame.dHelper.setSize(mouseX - startX, mouseY - startY);
+						dHelper.setLocation(startX, startY);
+						dHelper.setSize(mouseX - startX, mouseY - startY);
 						break;
 					}
 					case SW: {
-						MainGame.dHelper.setLocation(mouseX, startY);
-						MainGame.dHelper.setSize(startX - mouseX, mouseY - startY);
+						dHelper.setLocation(mouseX, startY);
+						dHelper.setSize(startX - mouseX, mouseY - startY);
 						break;
 					}
 				}
 			}
-			MainGame.dHelper.repaint();
+			dHelper.repaint();
 		}
 	}
 

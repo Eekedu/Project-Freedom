@@ -1,4 +1,6 @@
 package ca.eekedu.Project_Freedom;
+import static ca.eekedu.Project_Freedom.MainGame.*;
+import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -23,14 +25,14 @@ public class GraphicsDrawing extends JPanel{
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setColor(new Color(255, 0, 0));
-		g2.drawRect(0, 0, MainGame.SYSTEM_MAXDRAW_WIDTH - 1, MainGame.SYSTEM_MAXDRAW_HEIGHT - 1);
-		if (DrawingFrame.doDraw){
-			g2.setColor(MainGame.drawColor);
-			switch (MainGame.d_mode) {
-				case Line: g2.drawLine(DrawingFrame.startX, DrawingFrame.startY, DrawingFrame.mouseX, DrawingFrame.mouseY); break;
+		g2.drawRect(0, 0, SYSTEM_MAXDRAW_WIDTH - 1, SYSTEM_MAXDRAW_HEIGHT - 1);
+		if (doDraw){
+			g2.setColor(drawColor);
+			switch (d_mode) {
+				case Line: g2.drawLine(startX, startY, mouseX, mouseY); break;
 			}
-			DrawingFrame.doDraw = false;
-			DrawingFrame.startX = 0; DrawingFrame.startY = 0;
+			doDraw = false;
+			startX = 0; startY = 0;
 		}
 	}
 

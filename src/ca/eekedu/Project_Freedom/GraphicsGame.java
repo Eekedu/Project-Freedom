@@ -1,4 +1,6 @@
 package ca.eekedu.Project_Freedom;
+import static ca.eekedu.Project_Freedom.MainGame.*;
+import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -32,13 +34,13 @@ public class GraphicsGame extends JPanel {
 		g2.setColor(new Color(0, 0, 0));
 		g2.fillRect(0, 0, getWidth(), 23);
 		g2.setColor(new Color(255, 255, 255));
-		g2.drawString("Mode: " + ((MainGame.mode == MainGame.GAMEMODE.Game)? "Game" : "Draw"), 1, 18);
-		if (MainGame.mode == MainGame.GAMEMODE.Draw){
+		g2.drawString("Mode: " + ((mode == GAMEMODE.Game)? "Game" : "Draw"), 1, 18);
+		if (mode == GAMEMODE.Draw){
 			try {
-				g2.drawString("Mouse: (" + DrawingFrame.mouseX + "," + DrawingFrame.mouseY + ")", 201, 18);
-				g2.drawString("Color(RGB): " + MainGame.drawColor.getRed() + ", " 
-						+ MainGame.drawColor.getGreen() + ", " 
-						+ MainGame.drawColor.getBlue(), 401, 18);
+				g2.drawString("Mouse: (" + mouseX + "," + mouseY + ")", 201, 18);
+				g2.drawString("Color(RGB): " + drawColor.getRed() + ", " 
+						+ drawColor.getGreen() + ", " 
+						+ drawColor.getBlue(), 401, 18);
 			} catch (NullPointerException e){}
 		}
 		
