@@ -25,6 +25,7 @@ public class GraphicsDrawing extends JPanel{
 		g2.setColor(new Color(255, 0, 0));
 		g2.drawRect(0, 0, MainGame.SYSTEM_MAXDRAW_WIDTH - 1, MainGame.SYSTEM_MAXDRAW_HEIGHT - 1);
 		if (DrawingFrame.doDraw){
+			g2.setColor(MainGame.drawColor);
 			switch (MainGame.d_mode) {
 				case Line: g2.drawLine(DrawingFrame.startX, DrawingFrame.startY, DrawingFrame.mouseX, DrawingFrame.mouseY); break;
 			}

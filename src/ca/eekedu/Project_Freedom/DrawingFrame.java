@@ -12,9 +12,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 
+import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 
-public class DrawingFrame extends JFrame{
+public class DrawingFrame extends JFrame implements Runnable{
 	
 	private static final long serialVersionUID = 1644654621927813840L;
 	
@@ -25,6 +26,8 @@ public class DrawingFrame extends JFrame{
 	
 	public enum DIRECTION { None, NE, NW, SE, SW }
 	public static DIRECTION dir = DIRECTION.None;
+	
+	public volatile boolean running = true;
 	
 	public static GraphicsDrawing draw = new GraphicsDrawing();
 	
@@ -81,6 +84,16 @@ public class DrawingFrame extends JFrame{
 					pressed = true;
 					startX = mouseX; startY = mouseY;
 					mousePos();
+				} else if (e.getKeyCode() == KeyEvent.VK_C){
+					Color prevColor = MainGame.drawColor;
+					MainGame.drawColor = JColorChooser.showDialog(DrawingFrame.this, "Choose drawing color", MainGame.drawColor);
+					if (MainGame.drawColor == null){
+						MainGame.drawColor = prevColor;
+					}
+				} else if (e.getKeyCode() == KeyEvent.VK_ADD){
+					MainGame.drawColor = MainGame.drawColor.brighter();
+				}  else if (e.getKeyCode() == KeyEvent.VK_SUBTRACT){
+					MainGame.drawColor = MainGame.drawColor.darker();
 				}
 			}
 		});
@@ -162,6 +175,16 @@ public class DrawingFrame extends JFrame{
 			}
 			MainGame.dHelper.repaint();
 		}
+	}
+
+	public void run() {
+		while (running){
+			draw.update();
+		}
+	}
+	
+	public void stop() {
+		running = false;
 	}
 
 }

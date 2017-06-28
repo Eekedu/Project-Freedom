@@ -1,4 +1,5 @@
 package ca.eekedu.Project_Freedom;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
@@ -29,12 +30,15 @@ public class MainGame extends JFrame{
 	static int SYSTEM_MAXDRAW_WIDTH = 0;
 	static int SYSTEM_MAXDRAW_HEIGHT = 0;
 	
-	public enum GAMEMODE { Game, Draw }
+	public enum GAMEMODE { Menu, Game, Draw }
 	public enum DRAWMODE { Line, EmptyRect, FilledRect }
+	
 	public static GAMEMODE mode = GAMEMODE.Game;
 	public static DRAWMODE d_mode = DRAWMODE.Line;
 	public static DrawingFrame draw = null;
 	public static DrawHelperFrame dHelper = null;
+	public static Color drawColor = Color.RED;
+	public static Thread drawThread;
 	MainGame(){
 		
 		setTitle("Project Freedom");
@@ -81,6 +85,8 @@ public class MainGame extends JFrame{
 					dHelper = new DrawHelperFrame();
 					draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
 					mode = GAMEMODE.Draw;
+					drawThread = new Thread(draw);
+					drawThread.start();
 				}
 			}
 		});
@@ -115,9 +121,8 @@ public class MainGame extends JFrame{
 				if (draw != null){
 					if (!draw.isVisible()){
 						dHelper = null;
+						draw.stop();
 						draw = null;
-					} else {
-						DrawingFrame.draw.update();
 					}
 				}
 				checkControls();

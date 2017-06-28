@@ -41,7 +41,7 @@ public class DrawHelperFrame extends JFrame{
 		protected void paintComponent(Graphics g){
 			super.paintComponent(g);
 			Graphics2D g2 = (Graphics2D)g;
-			g2.setColor(Color.RED);
+			g2.setColor(MainGame.drawColor);
 			if (DrawingFrame.pressed){
 				int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
 				if (DrawingFrame.dir == DrawingFrame.DIRECTION.NE ||
