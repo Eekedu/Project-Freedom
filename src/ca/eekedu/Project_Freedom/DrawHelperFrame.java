@@ -2,7 +2,6 @@ package ca.eekedu.Project_Freedom;
 import static ca.eekedu.Project_Freedom.MainGame.*;
 import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.WindowAdapter;
@@ -12,14 +11,14 @@ import javax.swing.JPanel;
 public class DrawHelperFrame extends JFrame{
 	
 	private static final long serialVersionUID = -4898785221895216109L;
-
+	
+	DrawPanel drawPanel = new DrawPanel();
 	public DrawHelperFrame() {
-		add(new DrawPanel());
+		add(drawPanel);
 		setFocusable(false);
 		setUndecorated(true);
 		setSize(1, 1);
 		setLocation(1, 1);
-		setBackground(Color.BLACK);
 		setVisible(true);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		
@@ -35,9 +34,7 @@ public class DrawHelperFrame extends JFrame{
 
 		private static final long serialVersionUID = 6689874781906933342L;
 		
-		DrawPanel(){
-			setBackground(Color.BLACK);
-		}
+		DrawPanel(){}
 		
 		protected void paintComponent(Graphics g){
 			super.paintComponent(g);

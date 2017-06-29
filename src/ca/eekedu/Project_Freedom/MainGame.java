@@ -1,4 +1,7 @@
 package ca.eekedu.Project_Freedom;
+import static ca.eekedu.Project_Freedom.DrawingFrame.*;
+
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -83,10 +86,16 @@ public class MainGame extends JFrame{
 					keysPressed.put(e.getKeyCode(), 0);
 				} else if (e.getKeyCode() == KeyEvent.VK_SPACE){
 					dHelper = new DrawHelperFrame();
-					draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
-					mode = GAMEMODE.Draw;
-					drawThread = new Thread(draw);
-					drawThread.start();
+					try {
+						draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
+						mode = GAMEMODE.Draw;
+						getBackColor();
+						drawThread = new Thread(draw);
+						drawThread.start();
+					} catch (AWTException e1) {
+						System.out.println("Ooops Something went wrong!");
+						
+					}
 				}
 			}
 		});
@@ -138,10 +147,18 @@ public class MainGame extends JFrame{
 	
 	public static void checkControls(){
 		for (Integer key: keysPressed.keySet()){
-			if (key == KeyEvent.VK_W) graphics.y--;
-			if (key == KeyEvent.VK_S) graphics.y++;
-			if (key == KeyEvent.VK_A) graphics.x--;
-			if (key == KeyEvent.VK_D) graphics.x++;
+			if (key == KeyEvent.VK_W) 
+				if (mode == GAMEMODE.Game) graphics.y--; 
+				else if (mode == GAMEMODE.Draw && pressed) mouseRobot.mouseMove(mouseX, mouseY - 1); mousePos();
+			if (key == KeyEvent.VK_S) 
+				if (mode == GAMEMODE.Game) graphics.y++; 
+				else if (mode == GAMEMODE.Draw && pressed) mouseRobot.mouseMove(mouseX, mouseY + 1); mousePos();
+			if (key == KeyEvent.VK_A)
+				if (mode == GAMEMODE.Game) graphics.x--; 
+				else if (mode == GAMEMODE.Draw && pressed) mouseRobot.mouseMove(mouseX - 1, mouseY); mousePos();
+			if (key == KeyEvent.VK_D)
+				if (mode == GAMEMODE.Game) graphics.x++; 
+				else if (mode == GAMEMODE.Draw && pressed) mouseRobot.mouseMove(mouseX + 1, mouseY); mousePos();
 		}
 	}
 

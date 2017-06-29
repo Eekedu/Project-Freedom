@@ -1,9 +1,11 @@
 package ca.eekedu.Project_Freedom;
 import static ca.eekedu.Project_Freedom.MainGame.*;
 
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -33,8 +35,9 @@ public class DrawingFrame extends JFrame implements Runnable{
 	public volatile boolean running = true;
 	
 	public static GraphicsDrawing draw = new GraphicsDrawing();
+	public static Robot mouseRobot = null;
 	
-	DrawingFrame (int width, int height){
+	DrawingFrame (int width, int height) throws AWTException{
 		setTitle("Drawing Frame");
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setAlwaysOnTop(true);
@@ -46,6 +49,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 		add(draw);
 		setVisible(true);
 		toFront();
+		
+		mouseRobot = new Robot();
 		
 		addWindowListener(new WindowAdapter() {
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -75,6 +80,11 @@ public class DrawingFrame extends JFrame implements Runnable{
 					dHelper.setLocation(1, 1);
 					dHelper.setSize(1, 1);
 					doDraw = true;
+				} else if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_S ||
+						e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D){
+					if (keysPressed.containsKey(e.getKeyCode())){
+						keysPressed.remove(e.getKeyCode(), 0);
+					}
 				}
 			}
 			public void keyPressed(KeyEvent e) {
@@ -88,14 +98,21 @@ public class DrawingFrame extends JFrame implements Runnable{
 					mousePos();
 				} else if (e.getKeyCode() == KeyEvent.VK_C){
 					Color prevColor = drawColor;
-					drawColor = JColorChooser.showDialog(DrawingFrame.this, "Choose drawing color", drawColor);
+					drawColor = JColorChooser.showDialog(getParent(), "Choose drawing color", drawColor);
 					if (drawColor == null){
 						drawColor = prevColor;
+					} else {
+						getBackColor();
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_ADD){
 					drawColor = drawColor.brighter();
+					getBackColor();
 				}  else if (e.getKeyCode() == KeyEvent.VK_SUBTRACT){
 					drawColor = drawColor.darker();
+					getBackColor();
+				} else if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_S ||
+						e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D){
+					keysPressed.put(e.getKeyCode(), 0);
 				}
 			}
 		});
@@ -153,7 +170,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 	}
 	
 	@SuppressWarnings("incomplete-switch")
-	public void mousePos(){
+	public static void mousePos(){
 		Point p = MouseInfo.getPointerInfo().getLocation();
 		mouseX = p.x;
 		mouseY = p.y;
@@ -209,6 +226,15 @@ public class DrawingFrame extends JFrame implements Runnable{
 	
 	public void stop() {
 		running = false;
+	}
+	
+	public static void getBackColor(){
+		float hsv[] = new float[3];
+		Color.RGBtoHSB(255 - drawColor.getRed(), 255 - drawColor.getGreen(), 255 - drawColor.getBlue(), hsv);
+	    hsv[0] = (hsv[0] + 180) % 360;
+	    Color newColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
+	    dHelper.setBackground(newColor);
+		dHelper.drawPanel.setBackground(newColor);
 	}
 
 }
