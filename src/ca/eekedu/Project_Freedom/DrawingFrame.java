@@ -9,6 +9,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
@@ -70,7 +72,6 @@ public class DrawingFrame extends JFrame implements Runnable{
 				if (e.getKeyCode() == KeyEvent.VK_SHIFT){
 					pressed = false;
 					mousePos();
-					dir = DIRECTION.None;
 					dHelper.setLocation(1, 1);
 					dHelper.setSize(1, 1);
 					doDraw = true;
@@ -103,7 +104,6 @@ public class DrawingFrame extends JFrame implements Runnable{
 			public void mouseReleased(MouseEvent e) {
 				pressed = false;
 				mousePos();
-				dir = DIRECTION.None;
 				dHelper.setLocation(1, 1);
 				dHelper.setSize(1, 1);
 				doDraw = true;
@@ -124,6 +124,29 @@ public class DrawingFrame extends JFrame implements Runnable{
 			}
 			public void mouseDragged(MouseEvent e) {
 				mousePos();
+			}
+		});
+		
+		addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				DRAWMODE[] d = DRAWMODE.values();
+				int curIndex = 0;
+				for (int i = 0; i < d.length; i++){
+					if (d[i] == drawMode) curIndex = i;
+				}
+				if (e.getPreciseWheelRotation() < 0){
+					if (curIndex == 0){
+						drawMode = d[d.length -1];
+					} else {
+						drawMode = d[curIndex - 1];
+					}
+				} else if (e.getPreciseWheelRotation() > 0){
+					if (curIndex == d.length -1){
+						drawMode = d[0];
+					} else {
+						drawMode = d[curIndex + 1];
+					}
+				}
 			}
 		});
 		mousePos();

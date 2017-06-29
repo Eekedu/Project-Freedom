@@ -31,10 +31,10 @@ public class MainGame extends JFrame{
 	static int SYSTEM_MAXDRAW_HEIGHT = 0;
 	
 	public enum GAMEMODE { Menu, Game, Draw }
-	public enum DRAWMODE { Line, EmptyRect, FilledRect }
+	public enum DRAWMODE { Line, EmptyRect, FilledRect, Oval, FilledOval }
 	
 	public static GAMEMODE mode = GAMEMODE.Game;
-	public static DRAWMODE d_mode = DRAWMODE.Line;
+	public static DRAWMODE drawMode = DRAWMODE.Line;
 	public static DrawingFrame draw = null;
 	public static DrawHelperFrame dHelper = null;
 	public static Color drawColor = Color.RED;

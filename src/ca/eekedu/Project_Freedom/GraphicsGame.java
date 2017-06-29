@@ -33,16 +33,25 @@ public class GraphicsGame extends JPanel {
 		g2.setColor(new Color(0, 0, 0));
 		g2.fillRect(0, 0, getWidth(), 23);
 		g2.setColor(new Color(255, 255, 255));
-		g2.drawString("Mode: " + ((mode == GAMEMODE.Game)? "Game" : "Draw"), 1, 18);
+		g2.drawString("Mode: " + mode.toString(), 1, 18);
 		if (mode == GAMEMODE.Draw){
 			try {
-				g2.drawString("Mouse: (" + mouseX + "," + mouseY + ")", 201, 18);
-				g2.drawString("Color(RGB): " + drawColor.getRed() + ", " 
+				drawtabString(g2, "\tDraw Mode: " + drawMode.toString() + "\t" + 
+					"Mouse: (" + mouseX + "," + mouseY + ")\t" +
+					"Color(RGB): " + drawColor.getRed() + ", " 
 						+ drawColor.getGreen() + ", " 
-						+ drawColor.getBlue(), 401, 18);
+						+ drawColor.getBlue()
+					, -50, 18);
 			} catch (NullPointerException e){}
 		}
 		
 	}
+	
+	private void drawtabString(Graphics2D g2, String text, int x, int y) {
+        for (String line : text.split("\t")) {
+            g2.drawString(line, x, y);
+            x += g2.getFontMetrics().getHeight() * 10.5;
+        }
+    }
 
 }

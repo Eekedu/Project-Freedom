@@ -39,7 +39,6 @@ public class DrawHelperFrame extends JFrame{
 			setBackground(Color.BLACK);
 		}
 		
-		@SuppressWarnings("incomplete-switch")
 		protected void paintComponent(Graphics g){
 			super.paintComponent(g);
 			Graphics2D g2 = (Graphics2D)g;
@@ -55,8 +54,12 @@ public class DrawHelperFrame extends JFrame{
 					x1 = 0; y1 = 0;
 					x2 = getWidth(); y2 = getHeight();
 				}
-				switch (d_mode){
+				switch (drawMode){
 					case Line: g2.drawLine(x1, y1, x2, y2); break;
+					case EmptyRect: g2.drawRect(0, 0, getWidth() - 1, getHeight() - 1); break;
+					case FilledRect: g2.fillRect(0, 0, getWidth(), getHeight()); break;
+					case Oval: g2.drawOval(0, 0, getWidth() - 1, getHeight() - 1); break;
+					case FilledOval: g2.fillOval(0,0 , getWidth() - 1, getHeight() - 1);
 				}
 			}
 		}
