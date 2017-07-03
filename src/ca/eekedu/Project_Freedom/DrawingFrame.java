@@ -6,19 +6,15 @@ import java.awt.Color;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
+import java.awt.event.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
+
+import ca.eekedu.Project_Freedom.Drawings.Drawing;
+import ca.eekedu.Project_Freedom.Drawings.Drawing.DrawObject;
 
 public class DrawingFrame extends JFrame implements Runnable{
 	
@@ -28,6 +24,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 	public static int mouseX = 0; static int mouseY = 0;
 	public static boolean pressed = false;
 	public static boolean doDraw = false;
+	public static boolean center = false;
 	
 	public enum DIRECTION { None, NE, NW, SE, SW }
 	public static DIRECTION dir = DIRECTION.None;
@@ -36,6 +33,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 	
 	public static GraphicsDrawing draw = new GraphicsDrawing();
 	public static Robot mouseRobot = null;
+	public Map<Integer, DrawObject> drawObjects = new HashMap<Integer, DrawObject>();
+	public int drawingCount = 0;
 	
 	DrawingFrame (int width, int height) throws AWTException{
 		setTitle("Drawing Frame");
@@ -55,6 +54,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 		addWindowListener(new WindowAdapter() {
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 		    	mode = GAMEMODE.Game;
+		    	checkDrawings();
 		    	dispose();
 		    }
 		});
@@ -83,13 +83,22 @@ public class DrawingFrame extends JFrame implements Runnable{
 					if (keysPressed.containsKey(e.getKeyCode())){
 						keysPressed.remove(e.getKeyCode(), 0);
 					}
+				} else if (e.getKeyCode() == keybinds.get("CENTER_B")){
+					center = false;
+					mouseRobot.mouseMove(mouseX, mouseY);
+					mousePos();
 				}
 			}
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
-					dHelper.dispose();
-					mode = GAMEMODE.Game;
-					dispose();
+					if (!pressed){
+						dHelper.dispose();
+						checkDrawings();
+						mode = GAMEMODE.Game;
+						dispose();
+					} else {
+						pressed = false;
+					}
 				} else if (e.getKeyCode() == keybinds.get("CLICK_M")){
 					int mouseMod = (keybinds.get("MOUSE_P") - 1) * 2;
 					if (mouseMod == 0) mouseMod = 1;
@@ -111,6 +120,16 @@ public class DrawingFrame extends JFrame implements Runnable{
 				} else if (e.getKeyCode() == keybinds.get("C_UP") || e.getKeyCode() == keybinds.get("C_DOWN") ||
 						e.getKeyCode() == keybinds.get("C_LEFT") || e.getKeyCode() == keybinds.get("C_RIGHT")){
 					keysPressed.put(e.getKeyCode(), 0);
+				} else if (e.getKeyCode() == keybinds.get("CENTER_B") && pressed && !center){
+					center = true;
+					int newMouseX = (dir == DIRECTION.NE || dir == DIRECTION.SE)? 
+						mouseX - (dHelper.getWidth() /2):
+						startX - (dHelper.getWidth() / 2);
+					int newMouseY = (dir == DIRECTION.SW || dir == DIRECTION.SE)? 
+						mouseY -  (dHelper.getHeight() /2): 
+						startY -  (dHelper.getHeight() /2);
+					mouseRobot.mouseMove(newMouseX, newMouseY);
+					mousePos();
 				}
 			}
 		});
@@ -118,6 +137,10 @@ public class DrawingFrame extends JFrame implements Runnable{
 		addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == keybinds.get("MOUSE_P")){
+					Point endPos = new Point(dHelper.getLocation().x + dHelper.getWidth(), dHelper.getLocation().y + dHelper.getHeight());
+					DrawObject drawObject = new DrawObject(drawMode, dHelper.getLocation(), endPos, drawColor);
+					drawObjects.put(drawingCount, drawObject);
+					drawingCount++;
 					pressed = false;
 					mousePos();
 					dHelper.setLocation(1, 1);
@@ -161,9 +184,17 @@ public class DrawingFrame extends JFrame implements Runnable{
 	@SuppressWarnings("incomplete-switch")
 	public static void mousePos(){
 		Point p = MouseInfo.getPointerInfo().getLocation();
-		mouseX = p.x;
-		mouseY = p.y;
+		if (center){
+			startX = p.x - (dHelper.getWidth() / 2);
+			startY = p.y - (dHelper.getHeight() / 2);
+			mouseX = p.x + (dHelper.getWidth() / 2);
+			mouseY = p.y + (dHelper.getWidth() / 2);
+		} else {
+			mouseX = p.x;
+			mouseY = p.y;
+		}
 		if (pressed){
+
 			if (mouseY < startY){
 				if (mouseX < startX){
 					dir = DIRECTION.NW;
@@ -224,6 +255,19 @@ public class DrawingFrame extends JFrame implements Runnable{
 	    Color newColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
 	    dHelper.setBackground(newColor);
 		dHelper.drawPanel.setBackground(newColor);
+	}
+	
+	public void checkDrawings(){
+		if (!drawObjects.isEmpty()){
+			DrawObject[] objects = new DrawObject[drawObjects.size()];
+			int at = 0;
+			for (DrawObject object: drawObjects.values()){
+				objects[at] = object;
+				at++;
+			}
+			Drawing drawing = new Drawing("NULL", objects);
+			drawingsList.put(0, drawing);
+		}
 	}
 
 }

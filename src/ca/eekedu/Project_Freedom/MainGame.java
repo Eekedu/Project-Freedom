@@ -51,6 +51,7 @@ public class MainGame extends JFrame{
 	}
 	
 	public static KeyBinds keybinds = new KeyBinds();
+	public static Drawings drawingsList = new Drawings();
 	
 	public static GAMEMODE mode = GAMEMODE.Game;
 	public static DRAWMODE drawMode = DRAWMODE.Line;
