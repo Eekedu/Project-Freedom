@@ -73,8 +73,8 @@ public class MainGame extends JFrame{
 					if (keysPressed.containsKey(e.getKeyCode())){
 						keysPressed.remove(e.getKeyCode(), 0);
 					}
-				} else if (e.getKeyCode() == keybinds.get("C_UP") || e.getKeyCode() == keybinds.get("C_DOWN") ||
-						e.getKeyCode() == keybinds.get("C_LEFT") || e.getKeyCode() == keybinds.get("C_RIGHT")){
+				} else if (e.getKeyCode() == keybinds.get("CHAR_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
+						e.getKeyCode() == keybinds.get("CHAR_LEFT") || e.getKeyCode() == keybinds.get("CHAR_RIGHT")){
 					if (keysPressed.containsKey(e.getKeyCode())){
 						keysPressed.remove(e.getKeyCode(), 0);
 					}
@@ -100,8 +100,8 @@ public class MainGame extends JFrame{
 						graphics.scale();
 					}
 				}
-				if (e.getKeyCode() == keybinds.get("C_UP") || e.getKeyCode() == keybinds.get("C_DOWN") ||
-						e.getKeyCode() == keybinds.get("C_LEFT") || e.getKeyCode() == keybinds.get("C_RIGHT")){
+				if (e.getKeyCode() == keybinds.get("CHAR_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
+						e.getKeyCode() == keybinds.get("CHAR_LEFT") || e.getKeyCode() == keybinds.get("CHAR_RIGHT")){
 					keysPressed.put(e.getKeyCode(), 0);
 				} else if (e.getKeyCode() == keybinds.get("DO_DRAW")){
 					dHelper = new DrawHelperFrame();
@@ -166,16 +166,16 @@ public class MainGame extends JFrame{
 	
 	public static void checkControls(){
 		for (Integer key: keysPressed.keySet()){
-			if (key == keybinds.get("C_UP")) 
+			if (key == keybinds.get("CHAR_UP")) 
 				if (mode == GAMEMODE.Game) graphics.y--; 
 				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY - 1); mousePos();
-			if (key == keybinds.get("C_DOWN")) 
+			if (key == keybinds.get("CHAR_DOWN")) 
 				if (mode == GAMEMODE.Game) graphics.y++; 
 				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY + 1); mousePos();
-			if (key == keybinds.get("C_LEFT"))
+			if (key == keybinds.get("CHAR_LEFT"))
 				if (mode == GAMEMODE.Game) graphics.x--; 
 				else if (pressed) mouseRobot.mouseMove(mouseX - 1, mouseY); mousePos();
-			if (key == keybinds.get("C_RIGHT"))
+			if (key == keybinds.get("CHAR_RIGHT"))
 				if (mode == GAMEMODE.Game) graphics.x++; 
 				else if (pressed) mouseRobot.mouseMove(mouseX + 1, mouseY); mousePos();
 		}

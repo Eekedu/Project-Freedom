@@ -78,8 +78,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 					int mouseMod = (keybinds.get("MOUSE_P") - 1) * 2;
 					if (mouseMod == 0) mouseMod = 1;
 					mouseRobot.mouseRelease(16 / mouseMod);
-				} else if (e.getKeyCode() == keybinds.get("C_UP") || e.getKeyCode() == keybinds.get("C_DOWN") ||
-						e.getKeyCode() == keybinds.get("C_LEFT") || e.getKeyCode() == keybinds.get("C_RIGHT")){
+				} else if (e.getKeyCode() == keybinds.get("CHAR_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
+						e.getKeyCode() == keybinds.get("CHAR_LEFT") || e.getKeyCode() == keybinds.get("CHAR_RIGHT")){
 					if (keysPressed.containsKey(e.getKeyCode())){
 						keysPressed.remove(e.getKeyCode(), 0);
 					}
@@ -117,8 +117,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 				}  else if (e.getKeyCode() == keybinds.get("COLOR_D")){
 					drawColor = drawColor.darker();
 					getBackColor();
-				} else if (e.getKeyCode() == keybinds.get("C_UP") || e.getKeyCode() == keybinds.get("C_DOWN") ||
-						e.getKeyCode() == keybinds.get("C_LEFT") || e.getKeyCode() == keybinds.get("C_RIGHT")){
+				} else if (e.getKeyCode() == keybinds.get("CHAR_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
+						e.getKeyCode() == keybinds.get("CHAR_LEFT") || e.getKeyCode() == keybinds.get("CHAR_RIGHT")){
 					keysPressed.put(e.getKeyCode(), 0);
 				} else if (e.getKeyCode() == keybinds.get("CENTER_B") && pressed && !center){
 					center = true;
@@ -130,6 +130,31 @@ public class DrawingFrame extends JFrame implements Runnable{
 						startY -  (dHelper.getHeight() /2);
 					mouseRobot.mouseMove(newMouseX, newMouseY);
 					mousePos();
+				} else if (e.getKeyCode() == keybinds.get("SELECT_O")){
+					if (!drawObjects.isEmpty()){
+						int minDistance = 1000000000;
+						Point newPos = new Point(0, 0);
+						DrawObject obj = new DrawObject();
+						for (DrawObject object: drawObjects.values()){
+							Point center = new Point(object.endPoints.x - ((object.endPoints.x - object.position.x) / 2), 
+													 object.endPoints.y - ((object.endPoints.y - object.position.y) / 2));
+							if (center.distance(mouseX, mouseY) < minDistance){
+								minDistance = (int) center.distance(mouseX, mouseY);
+								newPos = new Point(center.x, center.y);
+								obj = object;
+							}
+						}
+						int mouseMod = (keybinds.get("MOUSE_P") - 1) * 2;
+						if (mouseMod == 0) mouseMod = 1;
+						mouseRobot.mouseRelease(16 / mouseMod);
+						mouseRobot.mouseMove(newPos.x, newPos.y);
+						drawColor = obj.color;
+						dHelper.setLocation(obj.position);
+						dHelper.setSize(Math.abs(obj.endPoints.x - obj.position.x), Math.abs(obj.endPoints.y - obj.position.y));
+						pressed = true;
+						center = true;
+						mousePos();
+					}
 				}
 			}
 		});
@@ -137,22 +162,32 @@ public class DrawingFrame extends JFrame implements Runnable{
 		addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == keybinds.get("MOUSE_P")){
-					Point endPos = new Point(dHelper.getLocation().x + dHelper.getWidth(), dHelper.getLocation().y + dHelper.getHeight());
-					DrawObject drawObject = new DrawObject(drawMode, dHelper.getLocation(), endPos, drawColor);
-					drawObjects.put(drawingCount, drawObject);
-					drawingCount++;
-					pressed = false;
-					mousePos();
-					dHelper.setLocation(1, 1);
-					dHelper.setSize(1, 1);
-					doDraw = true;
+					if (pressed){
+						Point startPos = new Point();
+						Point endPos = new Point();
+						startPos = new Point(startX, startY);
+						endPos = new Point(mouseX, mouseY);
+						DrawObject drawObject = new DrawObject(drawMode, startPos, endPos, drawColor);
+						drawObjects.put(drawObjects.size(), drawObject);
+						drawingCount++;
+						pressed = false;
+						mousePos();
+						dHelper.setLocation(1, 1);
+						dHelper.setSize(1, 1);
+						doDraw = true;
+					} else {
+						dHelper.setLocation(1, 1);
+						dHelper.setSize(1, 1);
+					}
 				}
 			}
 			public void mousePressed(MouseEvent e) {
 				if (e.getButton() == keybinds.get("MOUSE_P")){
-					pressed = true;
-					startX = mouseX; startY = mouseY;
-					mousePos();
+					if (!pressed){
+						pressed = true;
+						startX = mouseX; startY = mouseY;
+						mousePos();
+					}
 				}
 			}
 			public void mouseExited(MouseEvent e) {}
@@ -188,7 +223,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 			startX = p.x - (dHelper.getWidth() / 2);
 			startY = p.y - (dHelper.getHeight() / 2);
 			mouseX = p.x + (dHelper.getWidth() / 2);
-			mouseY = p.y + (dHelper.getWidth() / 2);
+			mouseY = p.y + (dHelper.getHeight() / 2);
 		} else {
 			mouseX = p.x;
 			mouseY = p.y;
@@ -259,14 +294,10 @@ public class DrawingFrame extends JFrame implements Runnable{
 	
 	public void checkDrawings(){
 		if (!drawObjects.isEmpty()){
-			DrawObject[] objects = new DrawObject[drawObjects.size()];
-			int at = 0;
-			for (DrawObject object: drawObjects.values()){
-				objects[at] = object;
-				at++;
-			}
-			Drawing drawing = new Drawing("NULL", objects);
-			drawingsList.put(0, drawing);
+			Drawing drawing = new Drawing("NULL");
+			drawing.objects = (HashMap<Integer, DrawObject>)drawObjects;
+			drawingsList.put(drawingsList.size(), drawing);
+			System.out.println(drawing.objects + " \n" + drawingsList);
 		}
 	}
 

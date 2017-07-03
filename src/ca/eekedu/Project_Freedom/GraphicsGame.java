@@ -55,6 +55,10 @@ public class GraphicsGame extends JPanel {
 									dHelper.getWidth() + ", " + dHelper.getHeight())
 					, -50, 18);
 			} catch (NullPointerException e){}
+		} else {
+			if (!drawingsList.isEmpty()){
+				drawtabString(g2, "\t# of Drawings: " + drawingsList.size(), -50, 18);
+			}
 		}
 		
 	}

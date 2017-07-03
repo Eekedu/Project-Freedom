@@ -13,10 +13,9 @@ public class Drawings extends HashMap<Integer, Drawing> {
 	public static class Drawing {
 		
 		String drawingName = "";
-		DrawObject[] objects = null;
-		Drawing(String name, DrawObject[] objects){
+		HashMap<Integer, DrawObject> objects = new HashMap<>();
+		Drawing(String name){
 			this.drawingName = name;
-			this.objects = objects;
 		}
 
 		public static class DrawObject {
@@ -25,7 +24,9 @@ public class Drawings extends HashMap<Integer, Drawing> {
 			Point endPoints = new Point(0, 0);
 			Color color = new Color(0, 0, 0);
 			
+			public DrawObject(){}
 			DrawObject(DRAWMODE type, Point position, Point endPoints, Color color){
+				super();
 				this.type = type; this.position = position; this.endPoints = endPoints; this.color = color;
 			}
 		}
