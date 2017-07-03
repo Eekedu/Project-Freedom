@@ -23,15 +23,18 @@ public class KeyBinds extends HashMap<String, Integer> {
 	public void populate_defaults(File keybinds) throws Exception{
 		FileWriter fw;
 		fw = new FileWriter(keybinds);
-		fw.write("C_UP: 87\n"
-				+ "C_DOWN: 83\n"
-				+ "C_LEFT: 65\n"
-				+ "C_RIGHT: 68\n"
-				+ "SIZE_UP: 38\n"
-				+ "SIZE_DOWN: 40\n"
-				+ "DO_DRAW: 32\n"
-				+ "CLICK_M: 16\n"
-				+ "COLOR_C: 67");
+		fw.write("C_UP:\t87\n"
+				+ "C_DOWN:\t83\n"
+				+ "C_LEFT:\t65\n"
+				+ "C_RIGHT:\t68\n"
+				+ "SIZE_UP:\t38\n"
+				+ "SIZE_DOWN:\t40\n"
+				+ "DO_DRAW:\t32\n"
+				+ "CLICK_M:\t16\n"
+				+ "COLOR_C:\t67\n"
+				+ "COLOR_B:\t107\n"
+				+ "COLOR_D:\t109\n"
+				+ "MOUSE_P:\t0x1");
 		fw.close();
 	}
 	
@@ -41,10 +44,11 @@ public class KeyBinds extends HashMap<String, Integer> {
 			BufferedReader br = new BufferedReader(fr);
 			String line; int count = 0;
 			while((line = br.readLine()) != null){
-				String[] key = line.split(": ");
+				String[] key = line.split(":\t");
 				switch (key[0]){
 					case "C_UP": case "C_DOWN": case "C_LEFT": case "C_RIGHT": 
-					case "SIZE_UP": case "SIZE_DOWN": case "DO_DRAW": case "CLICK_M": case "COLOR_C": {
+					case "SIZE_UP": case "SIZE_DOWN": case "DO_DRAW": case "CLICK_M": 
+					case "COLOR_C": case "COLOR_B": case "COLOR_D": case "MOUSE_P": {
 						put(key[0], Integer.decode((key[1])));
 						count++; break;
 					}
@@ -53,13 +57,14 @@ public class KeyBinds extends HashMap<String, Integer> {
 			}
 			br.close();
 			fr.close();
-			if (count < 9){
+			if (count < 12){
 				clear();
 				keybinds.delete();
 				populate_defaults(keybinds);
 				read(keybinds);
 			}
 		} catch (Exception e) {
+			clear();
 			keybinds.delete();
 			try {
 				populate_defaults(keybinds);

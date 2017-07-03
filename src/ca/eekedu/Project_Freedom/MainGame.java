@@ -19,9 +19,6 @@ import javax.swing.*;
 public class MainGame extends JFrame{
 	
 	private static final long serialVersionUID = -2787039850560314750L;
-
-	public static MainGame mainGame = null;
-	public static GraphicsGame graphics = new GraphicsGame();
 	
 	public static Map<Integer, Integer> keysPressed = new HashMap<Integer, Integer>();
 	static Timer update = new Timer(0, null);
@@ -32,6 +29,9 @@ public class MainGame extends JFrame{
 	static int SYSTEM_RES_HEIGHT = 0;
 	static int SYSTEM_MAXDRAW_WIDTH = 0;
 	static int SYSTEM_MAXDRAW_HEIGHT = 0;
+	
+	public static MainGame mainGame = null;
+	public static GraphicsGame graphics = new GraphicsGame();
 	
 	public enum GAMEMODE { Menu, Game, Draw }
 	public enum DRAWMODE { Line, EmptyRect, FilledRect, Oval, FilledOval;
@@ -91,16 +91,18 @@ public class MainGame extends JFrame{
 						RESOLUTION_WIDTH = 1280;
 						RESOLUTION_HEIGHT = 800;
 						positionWindowAndSize();
+						graphics.scale();
 					} else if (e.getKeyCode() == keybinds.get("SIZE_DOWN")){
 						RESOLUTION_WIDTH = 1080;
 						RESOLUTION_HEIGHT = 720;
 						positionWindowAndSize();
+						graphics.scale();
 					}
 				}
 				if (e.getKeyCode() == keybinds.get("C_UP") || e.getKeyCode() == keybinds.get("C_DOWN") ||
 						e.getKeyCode() == keybinds.get("C_LEFT") || e.getKeyCode() == keybinds.get("C_RIGHT")){
 					keysPressed.put(e.getKeyCode(), 0);
-				} else if (e.getKeyCode() == KeyEvent.VK_SPACE){
+				} else if (e.getKeyCode() == keybinds.get("DO_DRAW")){
 					dHelper = new DrawHelperFrame();
 					try {
 						draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
@@ -165,16 +167,16 @@ public class MainGame extends JFrame{
 		for (Integer key: keysPressed.keySet()){
 			if (key == keybinds.get("C_UP")) 
 				if (mode == GAMEMODE.Game) graphics.y--; 
-				else if (mode == GAMEMODE.Draw && pressed) mouseRobot.mouseMove(mouseX, mouseY - 1); mousePos();
+				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY - 1); mousePos();
 			if (key == keybinds.get("C_DOWN")) 
 				if (mode == GAMEMODE.Game) graphics.y++; 
-				else if (mode == GAMEMODE.Draw && pressed) mouseRobot.mouseMove(mouseX, mouseY + 1); mousePos();
+				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY + 1); mousePos();
 			if (key == keybinds.get("C_LEFT"))
 				if (mode == GAMEMODE.Game) graphics.x--; 
-				else if (mode == GAMEMODE.Draw && pressed) mouseRobot.mouseMove(mouseX - 1, mouseY); mousePos();
+				else if (pressed) mouseRobot.mouseMove(mouseX - 1, mouseY); mousePos();
 			if (key == keybinds.get("C_RIGHT"))
 				if (mode == GAMEMODE.Game) graphics.x++; 
-				else if (mode == GAMEMODE.Draw && pressed) mouseRobot.mouseMove(mouseX + 1, mouseY); mousePos();
+				else if (pressed) mouseRobot.mouseMove(mouseX + 1, mouseY); mousePos();
 		}
 	}
 

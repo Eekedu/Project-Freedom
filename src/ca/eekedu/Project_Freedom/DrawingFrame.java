@@ -75,11 +75,9 @@ public class DrawingFrame extends JFrame implements Runnable{
 			public void keyTyped(KeyEvent e) {}
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == keybinds.get("CLICK_M")){
-					pressed = false;
-					mousePos();
-					dHelper.setLocation(1, 1);
-					dHelper.setSize(1, 1);
-					doDraw = true;
+					int mouseMod = (keybinds.get("MOUSE_P") - 1) * 2;
+					if (mouseMod == 0) mouseMod = 1;
+					mouseRobot.mouseRelease(16 / mouseMod);
 				} else if (e.getKeyCode() == keybinds.get("C_UP") || e.getKeyCode() == keybinds.get("C_DOWN") ||
 						e.getKeyCode() == keybinds.get("C_LEFT") || e.getKeyCode() == keybinds.get("C_RIGHT")){
 					if (keysPressed.containsKey(e.getKeyCode())){
@@ -93,9 +91,9 @@ public class DrawingFrame extends JFrame implements Runnable{
 					mode = GAMEMODE.Game;
 					dispose();
 				} else if (e.getKeyCode() == keybinds.get("CLICK_M")){
-					pressed = true;
-					startX = mouseX; startY = mouseY;
-					mousePos();
+					int mouseMod = (keybinds.get("MOUSE_P") - 1) * 2;
+					if (mouseMod == 0) mouseMod = 1;
+					mouseRobot.mousePress(16 / mouseMod);
 				} else if (e.getKeyCode() == keybinds.get("COLOR_C")){
 					Color prevColor = drawColor;
 					drawColor = JColorChooser.showDialog(getParent(), "Choose drawing color", drawColor);
@@ -104,10 +102,10 @@ public class DrawingFrame extends JFrame implements Runnable{
 					} else {
 						getBackColor();
 					}
-				} else if (e.getKeyCode() == KeyEvent.VK_ADD){
+				} else if (e.getKeyCode() == keybinds.get("COLOR_B")){
 					drawColor = drawColor.brighter();
 					getBackColor();
-				}  else if (e.getKeyCode() == KeyEvent.VK_SUBTRACT){
+				}  else if (e.getKeyCode() == keybinds.get("COLOR_D")){
 					drawColor = drawColor.darker();
 					getBackColor();
 				} else if (e.getKeyCode() == keybinds.get("C_UP") || e.getKeyCode() == keybinds.get("C_DOWN") ||
@@ -119,16 +117,20 @@ public class DrawingFrame extends JFrame implements Runnable{
 		
 		addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent e) {
-				pressed = false;
-				mousePos();
-				dHelper.setLocation(1, 1);
-				dHelper.setSize(1, 1);
-				doDraw = true;
+				if (e.getButton() == keybinds.get("MOUSE_P")){
+					pressed = false;
+					mousePos();
+					dHelper.setLocation(1, 1);
+					dHelper.setSize(1, 1);
+					doDraw = true;
+				}
 			}
 			public void mousePressed(MouseEvent e) {
-				pressed = true;
-				startX = mouseX; startY = mouseY;
-				mousePos();
+				if (e.getButton() == keybinds.get("MOUSE_P")){
+					pressed = true;
+					startX = mouseX; startY = mouseY;
+					mousePos();
+				}
 			}
 			public void mouseExited(MouseEvent e) {}
 			public void mouseEntered(MouseEvent e) {}

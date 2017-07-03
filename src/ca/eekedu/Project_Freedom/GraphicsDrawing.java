@@ -5,7 +5,6 @@ import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-
 import javax.swing.JPanel;
 
 public class GraphicsDrawing extends JPanel{
