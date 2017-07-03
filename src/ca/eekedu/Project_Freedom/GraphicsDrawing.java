@@ -29,10 +29,10 @@ public class GraphicsDrawing extends JPanel{
 			g2.setColor(drawColor);
 			switch (drawMode) {
 				case Line: g2.drawLine(startX, startY, mouseX, mouseY); break;
-				case EmptyRect: Draw(g2, false); break;
-				case FilledRect: Draw(g2, true); break;
-				case Oval: Draw(g2, false); break;
-				case FilledOval: Draw(g2, true); break;
+				case EmptyRect: Draw(g2, 'R', false); break;
+				case FilledRect: Draw(g2, 'R', true); break;
+				case Oval: Draw(g2, 'O', false); break;
+				case FilledOval: Draw(g2, 'O', true); break;
 			}
 			dir = DIRECTION.None;
 			doDraw = false;
@@ -40,15 +40,18 @@ public class GraphicsDrawing extends JPanel{
 		}
 	}
 	
-	public void Draw(Graphics2D g2, boolean filled){
+	public void Draw(Graphics2D g2, char type, boolean filled){
 		int x = (mouseX < startX)? mouseX : startX;
 		int y = (mouseY < startY)? mouseY : startY;
 		int width = (mouseX > startX)? mouseX - startX: startX - mouseX;
 		int height = (mouseY > startY)? mouseY - startY: startY - mouseY;
-		if (filled){
-			if (drawMode == DRAWMODE.FilledOval) g2.fillOval(x, y, width, height); else g2.fillRect(x, y, width, height);
-		} else {
-			if (drawMode == DRAWMODE.Oval) g2.drawOval(x, y, width, height); else g2.drawRect(x, y, width, height);
+		switch (type){
+			case 'R': {
+				if (filled) g2.fillRect(x, y, width, height); else g2.drawRect(x, y, width, height); break;
+			}
+			case 'O':{ 
+				if (filled) g2.fillOval(x, y, width, height); else g2.drawOval(x, y, width, height); break;
+			}
 		}
 	}
 

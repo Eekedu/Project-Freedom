@@ -1,0 +1,71 @@
+package ca.eekedu.Project_Freedom;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.HashMap;
+
+public class KeyBinds extends HashMap<String, Integer> {
+
+	private static final long serialVersionUID = -3262002073024191000L;
+
+	KeyBinds(){
+		File keybinds = new File("keybinds.cfg");
+		if (!keybinds.exists()){
+			try {
+				populate_defaults(keybinds);
+			} catch (Exception e) {}
+		}
+		read(keybinds);
+	}
+	
+	public void populate_defaults(File keybinds) throws Exception{
+		FileWriter fw;
+		fw = new FileWriter(keybinds);
+		fw.write("C_UP: 87\n"
+				+ "C_DOWN: 83\n"
+				+ "C_LEFT: 65\n"
+				+ "C_RIGHT: 68\n"
+				+ "SIZE_UP: 38\n"
+				+ "SIZE_DOWN: 40\n"
+				+ "DO_DRAW: 32\n"
+				+ "CLICK_M: 16\n"
+				+ "COLOR_C: 67");
+		fw.close();
+	}
+	
+	public void read(File keybinds){
+		try {
+			FileReader fr = new FileReader(keybinds);
+			BufferedReader br = new BufferedReader(fr);
+			String line; int count = 0;
+			while((line = br.readLine()) != null){
+				String[] key = line.split(": ");
+				switch (key[0]){
+					case "C_UP": case "C_DOWN": case "C_LEFT": case "C_RIGHT": 
+					case "SIZE_UP": case "SIZE_DOWN": case "DO_DRAW": case "CLICK_M": case "COLOR_C": {
+						put(key[0], Integer.decode((key[1])));
+						count++; break;
+					}
+					default: break;
+				}
+			}
+			br.close();
+			fr.close();
+			if (count < 9){
+				clear();
+				keybinds.delete();
+				populate_defaults(keybinds);
+				read(keybinds);
+			}
+		} catch (Exception e) {
+			keybinds.delete();
+			try {
+				populate_defaults(keybinds);
+				read(keybinds);
+			} catch (Exception e1) {}
+		}
+	}
+	
+}

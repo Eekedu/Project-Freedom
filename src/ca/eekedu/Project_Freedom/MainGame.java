@@ -34,7 +34,23 @@ public class MainGame extends JFrame{
 	static int SYSTEM_MAXDRAW_HEIGHT = 0;
 	
 	public enum GAMEMODE { Menu, Game, Draw }
-	public enum DRAWMODE { Line, EmptyRect, FilledRect, Oval, FilledOval }
+	public enum DRAWMODE { Line, EmptyRect, FilledRect, Oval, FilledOval;
+		private static DRAWMODE[] vals = values();
+		public DRAWMODE next(){
+			if (this.ordinal() == vals.length - 1){
+				return vals[0];
+			}
+			return vals[(this.ordinal()) + 1];
+		}
+		public DRAWMODE previous(){
+			if (this.ordinal() == 0){
+				return vals[vals.length - 1];
+			}
+			return vals[(this.ordinal()) - 1];
+		}
+	}
+	
+	public static KeyBinds keybinds = new KeyBinds();
 	
 	public static GAMEMODE mode = GAMEMODE.Game;
 	public static DRAWMODE drawMode = DRAWMODE.Line;
@@ -56,8 +72,8 @@ public class MainGame extends JFrame{
 					if (keysPressed.containsKey(e.getKeyCode())){
 						keysPressed.remove(e.getKeyCode(), 0);
 					}
-				} else if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_S ||
-						e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D){
+				} else if (e.getKeyCode() == keybinds.get("C_UP") || e.getKeyCode() == keybinds.get("C_DOWN") ||
+						e.getKeyCode() == keybinds.get("C_LEFT") || e.getKeyCode() == keybinds.get("C_RIGHT")){
 					if (keysPressed.containsKey(e.getKeyCode())){
 						keysPressed.remove(e.getKeyCode(), 0);
 					}
@@ -71,18 +87,18 @@ public class MainGame extends JFrame{
 					update.stop();
 					dispose();
 				}else if ( keysPressed.containsKey(new Integer(KeyEvent.VK_SHIFT))){
-					if (e.getKeyCode() == KeyEvent.VK_UP){
+					if (e.getKeyCode() == keybinds.get("SIZE_UP")){
 						RESOLUTION_WIDTH = 1280;
 						RESOLUTION_HEIGHT = 800;
 						positionWindowAndSize();
-					} else if (e.getKeyCode() == KeyEvent.VK_DOWN){
+					} else if (e.getKeyCode() == keybinds.get("SIZE_DOWN")){
 						RESOLUTION_WIDTH = 1080;
 						RESOLUTION_HEIGHT = 720;
 						positionWindowAndSize();
 					}
 				}
-				if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_S ||
-						e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D){
+				if (e.getKeyCode() == keybinds.get("C_UP") || e.getKeyCode() == keybinds.get("C_DOWN") ||
+						e.getKeyCode() == keybinds.get("C_LEFT") || e.getKeyCode() == keybinds.get("C_RIGHT")){
 					keysPressed.put(e.getKeyCode(), 0);
 				} else if (e.getKeyCode() == KeyEvent.VK_SPACE){
 					dHelper = new DrawHelperFrame();
@@ -147,16 +163,16 @@ public class MainGame extends JFrame{
 	
 	public static void checkControls(){
 		for (Integer key: keysPressed.keySet()){
-			if (key == KeyEvent.VK_W) 
+			if (key == keybinds.get("C_UP")) 
 				if (mode == GAMEMODE.Game) graphics.y--; 
 				else if (mode == GAMEMODE.Draw && pressed) mouseRobot.mouseMove(mouseX, mouseY - 1); mousePos();
-			if (key == KeyEvent.VK_S) 
+			if (key == keybinds.get("C_DOWN")) 
 				if (mode == GAMEMODE.Game) graphics.y++; 
 				else if (mode == GAMEMODE.Draw && pressed) mouseRobot.mouseMove(mouseX, mouseY + 1); mousePos();
-			if (key == KeyEvent.VK_A)
+			if (key == keybinds.get("C_LEFT"))
 				if (mode == GAMEMODE.Game) graphics.x--; 
 				else if (mode == GAMEMODE.Draw && pressed) mouseRobot.mouseMove(mouseX - 1, mouseY); mousePos();
-			if (key == KeyEvent.VK_D)
+			if (key == keybinds.get("C_RIGHT"))
 				if (mode == GAMEMODE.Game) graphics.x++; 
 				else if (mode == GAMEMODE.Draw && pressed) mouseRobot.mouseMove(mouseX + 1, mouseY); mousePos();
 		}

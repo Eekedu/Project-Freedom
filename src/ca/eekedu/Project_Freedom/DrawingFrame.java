@@ -74,14 +74,14 @@ public class DrawingFrame extends JFrame implements Runnable{
 		addKeyListener(new KeyListener() {
 			public void keyTyped(KeyEvent e) {}
 			public void keyReleased(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_SHIFT){
+				if (e.getKeyCode() == keybinds.get("CLICK_M")){
 					pressed = false;
 					mousePos();
 					dHelper.setLocation(1, 1);
 					dHelper.setSize(1, 1);
 					doDraw = true;
-				} else if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_S ||
-						e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D){
+				} else if (e.getKeyCode() == keybinds.get("C_UP") || e.getKeyCode() == keybinds.get("C_DOWN") ||
+						e.getKeyCode() == keybinds.get("C_LEFT") || e.getKeyCode() == keybinds.get("C_RIGHT")){
 					if (keysPressed.containsKey(e.getKeyCode())){
 						keysPressed.remove(e.getKeyCode(), 0);
 					}
@@ -92,11 +92,11 @@ public class DrawingFrame extends JFrame implements Runnable{
 					dHelper.dispose();
 					mode = GAMEMODE.Game;
 					dispose();
-				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT){
+				} else if (e.getKeyCode() == keybinds.get("CLICK_M")){
 					pressed = true;
 					startX = mouseX; startY = mouseY;
 					mousePos();
-				} else if (e.getKeyCode() == KeyEvent.VK_C){
+				} else if (e.getKeyCode() == keybinds.get("COLOR_C")){
 					Color prevColor = drawColor;
 					drawColor = JColorChooser.showDialog(getParent(), "Choose drawing color", drawColor);
 					if (drawColor == null){
@@ -110,8 +110,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 				}  else if (e.getKeyCode() == KeyEvent.VK_SUBTRACT){
 					drawColor = drawColor.darker();
 					getBackColor();
-				} else if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_S ||
-						e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D){
+				} else if (e.getKeyCode() == keybinds.get("C_UP") || e.getKeyCode() == keybinds.get("C_DOWN") ||
+						e.getKeyCode() == keybinds.get("C_LEFT") || e.getKeyCode() == keybinds.get("C_RIGHT")){
 					keysPressed.put(e.getKeyCode(), 0);
 				}
 			}
@@ -146,23 +146,10 @@ public class DrawingFrame extends JFrame implements Runnable{
 		
 		addMouseWheelListener(new MouseWheelListener() {
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				DRAWMODE[] d = DRAWMODE.values();
-				int curIndex = 0;
-				for (int i = 0; i < d.length; i++){
-					if (d[i] == drawMode) curIndex = i;
-				}
 				if (e.getPreciseWheelRotation() < 0){
-					if (curIndex == 0){
-						drawMode = d[d.length -1];
-					} else {
-						drawMode = d[curIndex - 1];
-					}
+					drawMode = drawMode.previous();
 				} else if (e.getPreciseWheelRotation() > 0){
-					if (curIndex == d.length -1){
-						drawMode = d[0];
-					} else {
-						drawMode = d[curIndex + 1];
-					}
+					drawMode = drawMode.next();
 				}
 			}
 		});
