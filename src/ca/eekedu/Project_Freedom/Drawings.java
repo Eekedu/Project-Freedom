@@ -4,6 +4,7 @@ import static ca.eekedu.Project_Freedom.MainGame.*;
 import ca.eekedu.Project_Freedom.Drawings.Drawing;
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 public class Drawings extends HashMap<Integer, Drawing> {
@@ -13,9 +14,11 @@ public class Drawings extends HashMap<Integer, Drawing> {
 	public static class Drawing {
 		
 		String drawingName = "";
+		BufferedImage screenshot;
 		HashMap<Integer, DrawObject> objects = new HashMap<>();
-		Drawing(String name){
+		Drawing(String name, BufferedImage screenshot){
 			this.drawingName = name;
+			this.screenshot = screenshot;
 		}
 
 		public static class DrawObject {

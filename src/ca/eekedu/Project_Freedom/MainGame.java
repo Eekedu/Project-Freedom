@@ -1,7 +1,6 @@
 package ca.eekedu.Project_Freedom;
 import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
-import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -103,15 +102,19 @@ public class MainGame extends JFrame{
 				if (e.getKeyCode() == keybinds.get("CHAR_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
 						e.getKeyCode() == keybinds.get("CHAR_LEFT") || e.getKeyCode() == keybinds.get("CHAR_RIGHT")){
 					keysPressed.put(e.getKeyCode(), 0);
-				} else if (e.getKeyCode() == keybinds.get("DO_DRAW")){
+				} else if (e.getKeyCode() == keybinds.get("DO_DRAW") || e.getKeyCode() == KeyEvent.VK_1){
 					dHelper = new DrawHelperFrame();
 					try {
-						draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
+						if (!(e.getKeyCode() == KeyEvent.VK_1)) {
+							draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
+						} else {
+							draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT, drawingsList.get(0).objects);
+						}
 						mode = GAMEMODE.Draw;
 						getBackColor();
 						drawThread = new Thread(draw);
 						drawThread.start();
-					} catch (AWTException e1) {
+					} catch (Exception e1) {
 						System.out.println("Ooops Something went wrong!");
 						
 					}

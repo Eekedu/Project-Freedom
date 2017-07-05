@@ -5,7 +5,11 @@ import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+
 import javax.swing.JPanel;
+
+import ca.eekedu.Project_Freedom.Drawings.Drawing.DrawObject;
 
 public class GraphicsDrawing extends JPanel{
 	
@@ -21,25 +25,28 @@ public class GraphicsDrawing extends JPanel{
 	
 	protected void paintComponent(Graphics g){
 		super.paintComponent(g);
+		drawObjects(g);
+	}
+	
+	public void drawObjects(Graphics g){
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setColor(new Color(255, 0, 0));
 		g2.drawRect(0, 0, SYSTEM_MAXDRAW_WIDTH - 1, SYSTEM_MAXDRAW_HEIGHT - 1);
-		if (doDraw){
-			g2.setColor(drawColor);
-			switch (drawMode) {
-				case Line: g2.drawLine(startX, startY, mouseX, mouseY); break;
-				case EmptyRect: Draw(g2, 'R', false); break;
-				case FilledRect: Draw(g2, 'R', true); break;
-				case Oval: Draw(g2, 'O', false); break;
-				case FilledOval: Draw(g2, 'O', true); break;
+		for(DrawObject object: drawObjects.values()){
+			g2.setColor(object.color);
+			switch (object.type) {
+				case Line: g2.drawLine(object.position.x, object.position.y, object.endPoints.x, object.endPoints.y); break;
+				case EmptyRect: Draw(g2, 'R', object.position, object.endPoints, false); break;
+				case FilledRect: Draw(g2, 'R', object.position, object.endPoints, true); break;
+				case Oval: Draw(g2, 'O', object.position, object.endPoints, false); break;
+				case FilledOval: Draw(g2, 'O', object.position, object.endPoints, true); break;
 			}
-			dir = DIRECTION.None;
-			doDraw = false;
-			startX = 0; startY = 0;
 		}
 	}
 	
-	public void Draw(Graphics2D g2, char type, boolean filled){
+	public void Draw(Graphics2D g2, char type, Point start, Point end, boolean filled){
+		int startX = start.x; int startY = start.y;
+		int mouseX = end.x; int mouseY = end.y;
 		int x = (mouseX < startX)? mouseX : startX;
 		int y = (mouseY < startY)? mouseY : startY;
 		int width = (mouseX > startX)? mouseX - startX: startX - mouseX;

@@ -52,6 +52,11 @@ public class KeyBinds extends HashMap<String, Integer> {
 					case "SIZE_UP": case "SIZE_DOWN": case "DO_DRAW": case "CLICK_M": 
 					case "COLOR_C": case "COLOR_B": case "COLOR_D": case "MOUSE_P": 
 					case "CENTER_B": case "SELECT_O": {
+						if (key[0] == "MOUSE_P"){
+							if (Integer.decode(key[1]) < 1 || Integer.decode(key[1]) > 3){
+								break;
+							}
+						}
 						put(key[0], Integer.decode((key[1])));
 						count++; break;
 					}

@@ -1,18 +1,19 @@
 package ca.eekedu.Project_Freedom;
 import static ca.eekedu.Project_Freedom.MainGame.*;
 
-import java.awt.AWTException;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
-
+import javax.imageio.ImageIO;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
-
 import ca.eekedu.Project_Freedom.Drawings.Drawing;
 import ca.eekedu.Project_Freedom.Drawings.Drawing.DrawObject;
 
@@ -23,7 +24,6 @@ public class DrawingFrame extends JFrame implements Runnable{
 	public static int startX = 0; static int startY = 0;
 	public static int mouseX = 0; static int mouseY = 0;
 	public static boolean pressed = false;
-	public static boolean doDraw = false;
 	public static boolean center = false;
 	
 	public enum DIRECTION { None, NE, NW, SE, SW }
@@ -33,10 +33,10 @@ public class DrawingFrame extends JFrame implements Runnable{
 	
 	public static GraphicsDrawing draw = new GraphicsDrawing();
 	public static Robot mouseRobot = null;
-	public Map<Integer, DrawObject> drawObjects = new HashMap<Integer, DrawObject>();
+	public static HashMap<Integer, DrawObject> drawObjects = new HashMap<Integer, DrawObject>();
 	public int drawingCount = 0;
 	
-	DrawingFrame (int width, int height) throws AWTException{
+	DrawingFrame (int width, int height) throws Exception{
 		setTitle("Drawing Frame");
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setAlwaysOnTop(true);
@@ -48,14 +48,13 @@ public class DrawingFrame extends JFrame implements Runnable{
 		add(draw);
 		setVisible(true);
 		toFront();
+		drawObjects = new HashMap<Integer, DrawObject>();
 		
 		mouseRobot = new Robot();
 		
 		addWindowListener(new WindowAdapter() {
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-		    	mode = GAMEMODE.Game;
-		    	checkDrawings();
-		    	dispose();
+		    	saveDrawing();
 		    }
 		});
 		
@@ -92,10 +91,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
 					if (!pressed){
-						dHelper.dispose();
-						checkDrawings();
-						mode = GAMEMODE.Game;
-						dispose();
+						saveDrawing();
 					} else {
 						pressed = false;
 					}
@@ -131,29 +127,32 @@ public class DrawingFrame extends JFrame implements Runnable{
 					mouseRobot.mouseMove(newMouseX, newMouseY);
 					mousePos();
 				} else if (e.getKeyCode() == keybinds.get("SELECT_O")){
-					if (!drawObjects.isEmpty()){
-						int minDistance = 1000000000;
-						Point newPos = new Point(0, 0);
-						DrawObject obj = new DrawObject();
-						for (DrawObject object: drawObjects.values()){
-							Point center = new Point(object.endPoints.x - ((object.endPoints.x - object.position.x) / 2), 
-													 object.endPoints.y - ((object.endPoints.y - object.position.y) / 2));
-							if (center.distance(mouseX, mouseY) < minDistance){
-								minDistance = (int) center.distance(mouseX, mouseY);
-								newPos = new Point(center.x, center.y);
-								obj = object;
+					if (!pressed && !center){
+						if (!drawObjects.isEmpty()){
+							int minDistance = 1000000000;
+							Point newPos = new Point(0, 0);
+							DrawObject obj = new DrawObject();
+							for (DrawObject object: drawObjects.values()){
+								Point center = new Point(object.endPoints.x - ((object.endPoints.x - object.position.x) / 2), 
+														 object.endPoints.y - ((object.endPoints.y - object.position.y) / 2));
+								if (center.distance(mouseX, mouseY) < minDistance){
+									minDistance = (int) center.distance(mouseX, mouseY);
+									newPos = new Point(center.x, center.y);
+									obj = object;
+								}
 							}
+							int mouseMod = (keybinds.get("MOUSE_P") - 1) * 2;
+							if (mouseMod == 0) mouseMod = 1;
+							mouseRobot.mouseRelease(16 / mouseMod);
+							mouseRobot.mouseMove(newPos.x, newPos.y);
+							drawColor = obj.color;
+							drawMode = obj.type;
+							dHelper.setLocation(obj.position);
+							dHelper.setSize(Math.abs(obj.endPoints.x - obj.position.x), Math.abs(obj.endPoints.y - obj.position.y));
+							pressed = true;
+							center = true;
+							mousePos();
 						}
-						int mouseMod = (keybinds.get("MOUSE_P") - 1) * 2;
-						if (mouseMod == 0) mouseMod = 1;
-						mouseRobot.mouseRelease(16 / mouseMod);
-						mouseRobot.mouseMove(newPos.x, newPos.y);
-						drawColor = obj.color;
-						dHelper.setLocation(obj.position);
-						dHelper.setSize(Math.abs(obj.endPoints.x - obj.position.x), Math.abs(obj.endPoints.y - obj.position.y));
-						pressed = true;
-						center = true;
-						mousePos();
 					}
 				}
 			}
@@ -174,7 +173,6 @@ public class DrawingFrame extends JFrame implements Runnable{
 						mousePos();
 						dHelper.setLocation(1, 1);
 						dHelper.setSize(1, 1);
-						doDraw = true;
 					} else {
 						dHelper.setLocation(1, 1);
 						dHelper.setSize(1, 1);
@@ -214,6 +212,16 @@ public class DrawingFrame extends JFrame implements Runnable{
 			}
 		});
 		mousePos();
+	}
+	
+	DrawingFrame(int width, int height, HashMap<Integer, DrawObject> objects) throws Exception{
+		this(width, height);
+		drawObjects = new HashMap<Integer, DrawObject>();
+		for (DrawObject object: objects.values()){
+			drawObjects.put(drawObjects.size(), new DrawObject(object.type, object.position, object.endPoints, object.color));
+			drawingCount++;
+		}
+		System.out.println(drawingCount);
 	}
 	
 	@SuppressWarnings("incomplete-switch")
@@ -292,13 +300,20 @@ public class DrawingFrame extends JFrame implements Runnable{
 		dHelper.drawPanel.setBackground(newColor);
 	}
 	
-	public void checkDrawings(){
+	public void saveDrawing(){
 		if (!drawObjects.isEmpty()){
-			Drawing drawing = new Drawing("NULL");
+			BufferedImage screenshot = new BufferedImage(draw.getWidth(), draw.getHeight(), BufferedImage.TYPE_INT_ARGB);
+	    	Graphics2D g2 = screenshot.createGraphics();
+	    	draw.paint(g2);
+			Drawing drawing = new Drawing("NULL", screenshot);
 			drawing.objects = (HashMap<Integer, DrawObject>)drawObjects;
 			drawingsList.put(drawingsList.size(), drawing);
 			System.out.println(drawing.objects + " \n" + drawingsList);
 		}
+    	mode = GAMEMODE.Game;
+    	running = false;
+    	dHelper.dispose();
+    	dispose();
 	}
 
 }
