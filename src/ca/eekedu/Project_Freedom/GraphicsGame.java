@@ -8,12 +8,17 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
-
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
+import ca.eekedu.Project_Freedom.Drawings.Drawing;
 public class GraphicsGame extends JPanel {
 	int x = 0; int y = 0;
 	float scale;
+	JScrollPane inventory;
+	JPanel inventoryPanel = new JPanel(); 
 	GraphicsGame(){
 		setForeground(new Color(0, 0, 0));
 		scale();
@@ -22,6 +27,35 @@ public class GraphicsGame extends JPanel {
 	private static final long serialVersionUID = -5342794367022521148L;
 
 	public void update(){
+		repaint();
+	}
+	
+	public void createInventory(){
+		inventoryPanel = new JPanel();
+		inventoryPanel.setLayout(null);
+		int buttonX = 0; int buttonY = 0;
+		for (Drawing drawing: drawingsList.values()){
+			if (buttonX >  399){
+				buttonY += 100;
+				buttonX = 0;
+			}
+			JButton button = new JButton();
+			button.setIcon(new ImageIcon(drawing.screenshot.getScaledInstance(200, 100, RenderingHints.KEY_ANTIALIASING.hashCode())));
+			button.setToolTipText(drawing.drawingName);
+			button.setContentAreaFilled(false);
+			button.setBounds(buttonX, buttonY, 200, 100);
+			button.setFocusable(false);
+			inventoryPanel.add(button);
+			buttonX += 200;
+		}
+		inventory = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		inventory.setViewportView(inventoryPanel);
+		inventory.setBounds(RESOLUTION_WIDTH - 400, 24, 400, RESOLUTION_HEIGHT - 24);
+		inventory.setFocusable(false);
+		setLayout(null);
+		add(inventory);
+		inventory.requestFocus();
+		revalidate();
 		repaint();
 	}
 	

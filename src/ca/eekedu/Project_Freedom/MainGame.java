@@ -118,10 +118,18 @@ public class MainGame extends JFrame{
 						System.out.println("Ooops Something went wrong!");
 						
 					}
+				} else if (e.getKeyCode() == keybinds.get("INVENT_B")){
+					if (graphics.inventory == null){
+						graphics.createInventory();
+					} else {
+						graphics.remove(graphics.inventory);
+						graphics.inventory = null;
+						revalidate();
+						repaint();
+					}
 				}
 			}
 		});
-		
 		add(graphics);
 		setVisible(true);
 		positionWindowAndSize();
