@@ -16,9 +16,10 @@ public class Drawings extends HashMap<Integer, Drawing> {
 		String drawingName = "";
 		BufferedImage screenshot;
 		HashMap<Integer, DrawObject> objects = new HashMap<>();
-		Drawing(String name, BufferedImage screenshot){
+		Drawing(String name, BufferedImage screenshot, HashMap<Integer, DrawObject> objects){
 			this.drawingName = name;
 			this.screenshot = screenshot;
+			this.objects = objects;
 		}
 
 		public static class DrawObject {
