@@ -2,10 +2,13 @@ package ca.eekedu.Project_Freedom;
 import static ca.eekedu.Project_Freedom.MainGame.*;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -27,6 +30,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 	
 	public enum DIRECTION { None, NE, NW, SE, SW }
 	public static DIRECTION dir = DIRECTION.None;
+	
+	Cursor customCurs;
 	
 	public volatile boolean running = true;
 	
@@ -50,6 +55,11 @@ public class DrawingFrame extends JFrame implements Runnable{
 		setVisible(true);
 		toFront();
 		drawObjects = new HashMap<Integer, DrawObject>();
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Image cursImg = toolkit.getImage("curs.png");
+		Point hotSpot = new Point(0, 0);
+		customCurs = toolkit.createCustomCursor(cursImg, hotSpot, "Cursor");
+		setCursor(customCurs);
 		
 		mouseRobot = new Robot();
 		
@@ -314,8 +324,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 			BufferedImage screenshot = new BufferedImage(draw.getWidth(), draw.getHeight(), BufferedImage.TYPE_INT_ARGB);
 	    	Graphics2D g2 = screenshot.createGraphics();
 	    	draw.paint(g2);
-			Drawing drawing = new Drawing(name, screenshot);
-			drawing.objects = (HashMap<Integer, DrawObject>)drawObjects;
+			Drawing drawing = new Drawing(name, screenshot, drawObjects);
 			if (doEdit){
 				drawingsList.replace(curDrawingIndex, drawing);
 			} else {
