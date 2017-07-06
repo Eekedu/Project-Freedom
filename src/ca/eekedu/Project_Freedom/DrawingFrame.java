@@ -11,6 +11,8 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import ca.eekedu.Project_Freedom.Drawings.Drawing;
 import ca.eekedu.Project_Freedom.Drawings.Drawing.DrawObject;
 
@@ -31,6 +33,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 	public static GraphicsDrawing draw = new GraphicsDrawing();
 	public static Robot mouseRobot = null;
 	public static HashMap<Integer, DrawObject> drawObjects = new HashMap<Integer, DrawObject>();
+	public boolean doEdit = false;
+	public int curDrawingIndex = 0;
 	public int drawingCount = 0;
 	
 	DrawingFrame (int width, int height) throws Exception{
@@ -218,7 +222,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 			drawObjects.put(drawObjects.size(), new DrawObject(object.type, object.position, object.endPoints, object.color));
 			drawingCount++;
 		}
-		System.out.println(drawingCount);
+		doEdit = true;
 	}
 	
 	@SuppressWarnings("incomplete-switch")
@@ -299,13 +303,25 @@ public class DrawingFrame extends JFrame implements Runnable{
 	
 	public void saveDrawing(){
 		if (!drawObjects.isEmpty()){
+			String name = null;
+			if (!doEdit){
+				do {
+					name = JOptionPane.showInputDialog(this, "Enter a name for your drawing");
+				} while (name == null || name == "");
+			} else {
+				name = drawingsList.get(curDrawingIndex).drawingName;
+			}
 			BufferedImage screenshot = new BufferedImage(draw.getWidth(), draw.getHeight(), BufferedImage.TYPE_INT_ARGB);
 	    	Graphics2D g2 = screenshot.createGraphics();
 	    	draw.paint(g2);
-			Drawing drawing = new Drawing("NULL", screenshot);
+			Drawing drawing = new Drawing(name, screenshot);
 			drawing.objects = (HashMap<Integer, DrawObject>)drawObjects;
-			drawingsList.put(drawingsList.size(), drawing);
-			System.out.println(drawing.objects + " \n" + drawingsList);
+			if (doEdit){
+				drawingsList.replace(curDrawingIndex, drawing);
+			} else {
+				drawingsList.put(drawingCount, drawing);
+				drawingCount++;
+			}
 		}
     	mode = GAMEMODE.Game;
     	running = false;

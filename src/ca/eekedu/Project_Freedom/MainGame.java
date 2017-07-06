@@ -1,6 +1,8 @@
 package ca.eekedu.Project_Freedom;
+
 import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -11,15 +13,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashMap;
-import java.util.Map;
-
 import javax.swing.*;
 
 public class MainGame extends JFrame{
 	
 	private static final long serialVersionUID = -2787039850560314750L;
 	
-	public static Map<Integer, Integer> keysPressed = new HashMap<Integer, Integer>();
+	public static HashMap<Integer, Integer> keysPressed = new HashMap<Integer, Integer>();
 	static Timer update = new Timer(0, null);
 	
 	static int RESOLUTION_WIDTH = 1080;
@@ -58,7 +58,9 @@ public class MainGame extends JFrame{
 	public static DrawHelperFrame dHelper = null;
 	public static Color drawColor = Color.RED;
 	public static Thread drawThread;
-	MainGame(){
+	public static int drawingCount = 0;
+	
+	MainGame() throws AWTException{
 		
 		setTitle("Project Freedom");
 		setUndecorated(true);
@@ -102,14 +104,10 @@ public class MainGame extends JFrame{
 				if (e.getKeyCode() == keybinds.get("CHAR_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
 						e.getKeyCode() == keybinds.get("CHAR_LEFT") || e.getKeyCode() == keybinds.get("CHAR_RIGHT")){
 					keysPressed.put(e.getKeyCode(), 0);
-				} else if (e.getKeyCode() == keybinds.get("DO_DRAW") || e.getKeyCode() == KeyEvent.VK_1){
-					dHelper = new DrawHelperFrame();
+				} else if (e.getKeyCode() == keybinds.get("DO_DRAW")){
 					try {
-						if (!(e.getKeyCode() == KeyEvent.VK_1)) {
-							draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
-						} else {
-							draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT, drawingsList.get(0).objects);
-						}
+						dHelper = new DrawHelperFrame();
+						draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
 						mode = GAMEMODE.Draw;
 						getBackColor();
 						drawThread = new Thread(draw);
@@ -144,7 +142,7 @@ public class MainGame extends JFrame{
 		setLocation(posX, posY);
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws AWTException {
 		Dimension system_resolution = Toolkit.getDefaultToolkit().getScreenSize();
 		SYSTEM_RES_WIDTH = system_resolution.width;
 		SYSTEM_RES_HEIGHT = system_resolution.height;

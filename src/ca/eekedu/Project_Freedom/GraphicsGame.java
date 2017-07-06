@@ -8,17 +8,23 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Iterator;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import ca.eekedu.Project_Freedom.Drawings.Drawing;
+import ca.eekedu.Project_Freedom.MainGame.GAMEMODE;
+
 public class GraphicsGame extends JPanel {
 	int x = 0; int y = 0;
 	float scale;
 	JScrollPane inventory;
-	JPanel inventoryPanel = new JPanel(); 
+	JPanel inventoryPanel = new JPanel();
 	GraphicsGame(){
 		setForeground(new Color(0, 0, 0));
 		scale();
@@ -34,6 +40,7 @@ public class GraphicsGame extends JPanel {
 		inventoryPanel = new JPanel();
 		inventoryPanel.setLayout(null);
 		int buttonX = 0; int buttonY = 0;
+		Iterator<Integer> keyIt = drawingsList.keySet().iterator();
 		for (Drawing drawing: drawingsList.values()){
 			if (buttonX >  399){
 				buttonY += 100;
@@ -45,10 +52,14 @@ public class GraphicsGame extends JPanel {
 			button.setContentAreaFilled(false);
 			button.setBounds(buttonX, buttonY, 200, 100);
 			button.setFocusable(false);
+			ButtonClick btnCL = new ButtonClick();
+			btnCL.drawing = drawing;
+			btnCL.pos = keyIt.next();
+			button.addActionListener(btnCL);
 			inventoryPanel.add(button);
 			buttonX += 200;
 		}
-		inventory = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		inventory = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		inventory.setViewportView(inventoryPanel);
 		inventory.setBounds(RESOLUTION_WIDTH - 400, 24, 400, RESOLUTION_HEIGHT - 24);
 		inventory.setFocusable(false);
@@ -103,5 +114,30 @@ public class GraphicsGame extends JPanel {
             x += g2.getFontMetrics().getHeight() * 10.5;
         }
     }
+	
+	public class ButtonClick implements ActionListener{
+		Drawing drawing;
+		int pos;
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			try {
+				remove(inventory);
+				inventory = null;
+				mainGame.revalidate();
+				mainGame.repaint();
+				dHelper = new DrawHelperFrame();
+				MainGame.draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT, drawing.objects);
+				MainGame.draw.curDrawingIndex = pos;
+				drawing = null;
+				mode = GAMEMODE.Draw;
+				getBackColor();
+				drawThread = new Thread(MainGame.draw);
+				drawThread.start();
+				
+			} catch (Exception e1) {
+				System.out.println("Something went wrong!");
+			}
+		}
+	}
 
 }
