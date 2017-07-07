@@ -1,19 +1,21 @@
 package ca.eekedu.Project_Freedom;
 
-import static ca.eekedu.Project_Freedom.MainGame.*;
 import ca.eekedu.Project_Freedom.Drawings.Drawing;
-import java.awt.Color;
-import java.awt.Point;
+import org.dyn4j.dynamics.Body;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+
+import static ca.eekedu.Project_Freedom.MainGame.DRAWMODE;
 
 public class Drawings extends HashMap<Integer, Drawing> {
 
 	private static final long serialVersionUID = -4802139613225189806L;
 
-	public static class Drawing {
-		
-		String drawingName = "";
+    public static class Drawing extends Body {
+
+        String drawingName = "";
 		BufferedImage screenshot;
 		HashMap<Integer, DrawObject> objects = new HashMap<>();
 		Drawing(String name, BufferedImage screenshot, HashMap<Integer, DrawObject> objects){

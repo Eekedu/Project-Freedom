@@ -8,5 +8,6 @@
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />
+    <orderEntry type="library" name="dyn4j-v3.2.4" level="project" />
   </component>
 </module>
