@@ -16,8 +16,9 @@ public class Drawings extends HashMap<Integer, Drawing> {
     public static class Drawing extends Body {
 
         String drawingName = "";
-		BufferedImage screenshot;
-		HashMap<Integer, DrawObject> objects = new HashMap<>();
+        int weight = 0;
+        BufferedImage screenshot;
+        HashMap<Integer, DrawObject> objects = new HashMap<>();
 		Drawing(String name, BufferedImage screenshot, HashMap<Integer, DrawObject> objects){
 			this.drawingName = name;
 			this.screenshot = screenshot;
