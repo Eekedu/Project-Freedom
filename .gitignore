@@ -13,8 +13,8 @@
 /ignore.xml
 /ui.lnf.xml
 /vcs.xml
-/.gitignore
 /_linux/
 /.settings/
 /.idea/
 /codestyles/
+!/Project Freedom.iml
