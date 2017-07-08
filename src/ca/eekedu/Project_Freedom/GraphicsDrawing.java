@@ -1,20 +1,19 @@
 package ca.eekedu.Project_Freedom;
-import static ca.eekedu.Project_Freedom.MainGame.*;
-import static ca.eekedu.Project_Freedom.DrawingFrame.*;
-
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-
-import javax.swing.JPanel;
 
 import ca.eekedu.Project_Freedom.Drawings.Drawing.DrawObject;
 
-public class GraphicsDrawing extends JPanel{
+import javax.swing.*;
+import java.awt.*;
+
+import static ca.eekedu.Project_Freedom.DrawingFrame.drawObjects;
+import static ca.eekedu.Project_Freedom.MainGame.SYSTEM_MAXDRAW_HEIGHT;
+import static ca.eekedu.Project_Freedom.MainGame.SYSTEM_MAXDRAW_WIDTH;
+
+public class GraphicsDrawing extends JPanel {
 	
 	private static final long serialVersionUID = -3576483361126717271L;
-	GraphicsDrawing(){
+
+	GraphicsDrawing() {
 		setOpaque(false);
 		setBackground(new Color(255, 255, 255, 0));
 	}
@@ -22,13 +21,13 @@ public class GraphicsDrawing extends JPanel{
 	public void update(){
 		repaint();
 	}
-	
-	protected void paintComponent(Graphics g){
+
+	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		drawObjects(g);
 	}
-	
-	public void drawObjects(Graphics g){
+
+	public void drawObjects(Graphics g) {
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setColor(new Color(255, 0, 0));
 		g2.drawRect(0, 0, SYSTEM_MAXDRAW_WIDTH - 1, SYSTEM_MAXDRAW_HEIGHT - 1);
@@ -43,8 +42,8 @@ public class GraphicsDrawing extends JPanel{
 			}
 		}
 	}
-	
-	public void Draw(Graphics2D g2, char type, Point start, Point end, boolean filled){
+
+	public void Draw(Graphics2D g2, char type, Point start, Point end, boolean filled) {
 		int startX = start.x; int startY = start.y;
 		int mouseX = end.x; int mouseY = end.y;
 		int x = (mouseX < startX)? mouseX : startX;

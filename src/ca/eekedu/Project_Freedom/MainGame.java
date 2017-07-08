@@ -32,7 +32,8 @@ public class MainGame extends JFrame{
 	static int SYSTEM_RES_HEIGHT = 0;
 	static int SYSTEM_MAXDRAW_WIDTH = 0;
 	static int SYSTEM_MAXDRAW_HEIGHT = 0;
-	MainGame() throws AWTException{
+
+	MainGame() throws AWTException {
 
 		setTitle("Project Freedom");
 		setUndecorated(true);
@@ -131,12 +132,12 @@ public class MainGame extends JFrame{
 		update = new Timer(5, updateTimer); //Smooth update of graphics, reduced lag
 		update.start();
 
-		while (update.isRunning() || draw != null || dHelper != null){
+		while (update.isRunning() || draw != null || dHelper != null) {
 		}
 
 	}
-	
-	public static void checkControls(){
+
+	public static void checkControls() {
 		for (Integer key: keysPressed.keySet()){
 			if (key.equals(keybinds.get("CHAR_UP")))
 				if (mode == GAMEMODE.Game) graphics.y--;

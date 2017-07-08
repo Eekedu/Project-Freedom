@@ -45,18 +45,15 @@ public class GraphicsGame extends JPanel {
 			panel.setToolTipText(drawing.drawingName);
 			panel.setBounds(buttonX, buttonY, 200, 100);
 			panel.setLayout(new BorderLayout());
-			JButton button = new JButton();
+			JButton button = new JButton("EDIT");
 			button.setContentAreaFilled(false);
-			button.setText("EDIT");
 			button.setFocusable(false);
-			ButtonClick btnCL = new ButtonClick();
-			btnCL.drawing = drawing;
-			btnCL.pos = keyIt.next();
-			button.addActionListener(btnCL);
+			button.addActionListener(new ButtonClick(drawing, keyIt.next(), 'e'));
 
 			panel.addMouseListener(new myAdapter(panel, button));
 
 			inventoryPanel.add(panel);
+			inventoryPanel.addMouseListener(new myAdapter(panel, button, 1));
 			buttonX += 200;
 		}
 		inventory = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -134,23 +131,26 @@ public class GraphicsGame extends JPanel {
 	public class myAdapter extends MouseAdapter {
 		JButton button;
 		JPanel panel;
+		int type;
 
 		myAdapter(JPanel panel, JButton button) {
+			this(panel, button, 0);
+		}
+
+		myAdapter(JPanel panel, JButton button, int type) {
 			super();
 			this.panel = panel;
 			this.button = button;
+			this.type = type;
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-			panel.add(button, BorderLayout.SOUTH);
-			revalidate();
-			repaint();
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-			panel.remove(button);
+			if (type == 0) {
+				panel.add(button, BorderLayout.SOUTH);
+			} else {
+				panel.remove(button);
+			}
 			revalidate();
 			repaint();
 		}
@@ -159,21 +159,34 @@ public class GraphicsGame extends JPanel {
 	public class ButtonClick implements ActionListener{
 		Drawing drawing;
 		int pos;
+		char type;
+
+		ButtonClick(Drawing drawing, int pos, char type) {
+			super();
+			this.drawing = drawing;
+			this.pos = pos;
+			this.type = type;
+		}
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
-				remove(inventory);
-				inventory = null;
-				mainGame.revalidate();
-				mainGame.repaint();
-				dHelper = new DrawHelperFrame();
-				MainGame.draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT, drawing.objects);
-				MainGame.draw.curDrawingIndex = pos;
-				drawing = null;
-				mode = GAMEMODE.Draw;
-				getBackColor();
-				drawThread = new Thread(MainGame.draw);
-				drawThread.start();
+				switch (type) {
+					case 'e': {
+						remove(inventory);
+						inventory = null;
+						mainGame.revalidate();
+						mainGame.repaint();
+						dHelper = new DrawHelperFrame();
+						MainGame.draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT, drawing.objects);
+						MainGame.draw.curDrawingIndex = pos;
+						drawing = null;
+						mode = GAMEMODE.Draw;
+						getBackColor();
+						drawThread = new Thread(MainGame.draw);
+						drawThread.start();
+					}
+				}
 				
 			} catch (Exception e1) {
 				System.out.println("Something went wrong!");

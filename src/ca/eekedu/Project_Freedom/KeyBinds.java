@@ -10,7 +10,7 @@ public class KeyBinds extends HashMap<String, Integer> {
 
 	private static final long serialVersionUID = -3262002073024191000L;
 
-	KeyBinds(){
+	KeyBinds() {
 		File keybinds = new File("keybinds.cfg");
 		if (!keybinds.exists()){
 			try {
@@ -40,8 +40,8 @@ public class KeyBinds extends HashMap<String, Integer> {
 				+ "INVENT_B:\t73");
 		fw.close();
 	}
-	
-	public void read(File keybinds){
+
+	public void read(File keybinds) {
 		try {
 			FileReader fr = new FileReader(keybinds);
 			BufferedReader br = new BufferedReader(fr);
