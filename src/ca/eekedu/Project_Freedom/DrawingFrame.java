@@ -1,48 +1,37 @@
 package ca.eekedu.Project_Freedom;
-import static ca.eekedu.Project_Freedom.MainGame.*;
-
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import javax.swing.JColorChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 
 import ca.eekedu.Project_Freedom.Drawings.Drawing;
 import ca.eekedu.Project_Freedom.Drawings.Drawing.DrawObject;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+
+import static ca.eekedu.Project_Freedom.MainGame.*;
+
 public class DrawingFrame extends JFrame implements Runnable{
 	
 	private static final long serialVersionUID = 1644654621927813840L;
-	
-	public static int startX = 0; static int startY = 0;
-	public static int mouseX = 0; static int mouseY = 0;
-	public static boolean pressed = false;
-	public static boolean center = false;
-	
-	public enum DIRECTION { None, NE, NW, SE, SW }
-	public static DIRECTION dir = DIRECTION.None;
-	
-	Cursor customCurs;
-	
-	public volatile boolean running = true;
-	
+
+    public static int startX = 0;
+    public static int mouseX = 0;
+    public static boolean pressed = false;
+    public static boolean center = false;
+    public static DIRECTION dir = DIRECTION.None;
 	public static GraphicsDrawing draw = new GraphicsDrawing();
 	public static Robot mouseRobot = null;
 	public static HashMap<Integer, DrawObject> drawObjects = new HashMap<Integer, DrawObject>();
-	public boolean doEdit = false;
+    static int startY = 0;
+    static int mouseY = 0;
+    public volatile boolean running = true;
+    public boolean doEdit = false;
 	public int curDrawingIndex = 0;
 	public int drawingCount = 0;
-	
-	DrawingFrame (int width, int height) throws Exception{
+    Cursor customCurs;
+
+    DrawingFrame (int width, int height) throws Exception{
 		setTitle("Drawing Frame");
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setAlwaysOnTop(true);
@@ -54,23 +43,23 @@ public class DrawingFrame extends JFrame implements Runnable{
 		add(draw);
 		setVisible(true);
 		toFront();
-		drawObjects = new HashMap<Integer, DrawObject>();
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
+        drawObjects = new HashMap<>();
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Image cursImg = toolkit.getImage("curs.png");
 		Point hotSpot = new Point(0, 0);
 		customCurs = toolkit.createCustomCursor(cursImg, hotSpot, "Cursor");
 		setCursor(customCurs);
-		
+
 		mouseRobot = new Robot();
-		
+
 		addWindowListener(new WindowAdapter() {
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 		    	saveDrawing();
 		    }
 		});
-		
+
 		addWindowFocusListener(new WindowFocusListener() {
-			
+
 			public void windowLostFocus(WindowEvent e) {
 				mainGame.toFront();
 				if (dHelper != null){
@@ -80,7 +69,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 			}
 			public void windowGainedFocus(WindowEvent e) {}
 		});
-		
+
 		addKeyListener(new KeyListener() {
 			public void keyTyped(KeyEvent e) {}
 			public void keyReleased(KeyEvent e) {
@@ -129,12 +118,12 @@ public class DrawingFrame extends JFrame implements Runnable{
 					keysPressed.put(e.getKeyCode(), 0);
 				} else if (e.getKeyCode() == keybinds.get("CENTER_B") && pressed && !center){
 					center = true;
-					int newMouseX = (dir == DIRECTION.NE || dir == DIRECTION.SE)? 
-						mouseX - (dHelper.getWidth() /2):
+                    int newMouseX = (dir == DIRECTION.NE || dir == DIRECTION.SE) ?
+                            mouseX - (dHelper.getWidth() /2):
 						startX - (dHelper.getWidth() / 2);
-					int newMouseY = (dir == DIRECTION.SW || dir == DIRECTION.SE)? 
-						mouseY -  (dHelper.getHeight() /2): 
-						startY -  (dHelper.getHeight() /2);
+                    int newMouseY = (dir == DIRECTION.SW || dir == DIRECTION.SE) ?
+                            mouseY - (dHelper.getHeight() / 2) :
+                            startY -  (dHelper.getHeight() /2);
 					mouseRobot.mouseMove(newMouseX, newMouseY);
 					mousePos();
 				} else if (e.getKeyCode() == keybinds.get("SELECT_O")){
@@ -144,8 +133,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 							Point newPos = new Point(0, 0);
 							DrawObject obj = new DrawObject();
 							for (DrawObject object: drawObjects.values()){
-								Point center = new Point(object.endPoints.x - ((object.endPoints.x - object.position.x) / 2), 
-														 object.endPoints.y - ((object.endPoints.y - object.position.y) / 2));
+                                Point center = new Point(object.endPoints.x - ((object.endPoints.x - object.position.x) / 2),
+                                        object.endPoints.y - ((object.endPoints.y - object.position.y) / 2));
 								if (center.distance(mouseX, mouseY) < minDistance){
 									minDistance = (int) center.distance(mouseX, mouseY);
 									newPos = new Point(center.x, center.y);
@@ -168,14 +157,14 @@ public class DrawingFrame extends JFrame implements Runnable{
 				}
 			}
 		});
-		
+
 		addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == keybinds.get("MOUSE_P")){
 					if (pressed){
-						Point startPos = new Point();
-						Point endPos = new Point();
-						startPos = new Point(startX, startY);
+                        Point startPos;
+                        Point endPos;
+                        startPos = new Point(startX, startY);
 						endPos = new Point(mouseX, mouseY);
 						DrawObject drawObject = new DrawObject(drawMode, startPos, endPos, drawColor);
 						drawObjects.put(drawObjects.size(), drawObject);
@@ -203,8 +192,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 			public void mouseEntered(MouseEvent e) {}
 			public void mouseClicked(MouseEvent e) {}
 		});
-		
-		addMouseMotionListener(new MouseMotionListener() {
+
+        addMouseMotionListener(new MouseMotionListener() {
 			public void mouseMoved(MouseEvent e) {
 				mousePos();
 			}
@@ -212,10 +201,10 @@ public class DrawingFrame extends JFrame implements Runnable{
 				mousePos();
 			}
 		});
-		
-		addMouseWheelListener(new MouseWheelListener() {
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				if (e.getPreciseWheelRotation() < 0){
+
+        addMouseWheelListener(e -> {
+            {
+                if (e.getPreciseWheelRotation() < 0){
 					drawMode = drawMode.previous();
 				} else if (e.getPreciseWheelRotation() > 0){
 					drawMode = drawMode.next();
@@ -227,8 +216,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 	
 	DrawingFrame(int width, int height, HashMap<Integer, DrawObject> objects) throws Exception{
 		this(width, height);
-		drawObjects = new HashMap<Integer, DrawObject>();
-		for (DrawObject object: objects.values()){
+        drawObjects = new HashMap<>();
+        for (DrawObject object: objects.values()){
 			drawObjects.put(drawObjects.size(), new DrawObject(object.type, object.position, object.endPoints, object.color));
 			drawingCount++;
 		}
@@ -291,16 +280,6 @@ public class DrawingFrame extends JFrame implements Runnable{
 			dHelper.repaint();
 		}
 	}
-
-	public void run() {
-		while (running){
-			draw.update();
-		}
-	}
-	
-	public void stop() {
-		running = false;
-	}
 	
 	public static void getBackColor(){
 		float hsv[] = new float[3];
@@ -310,11 +289,21 @@ public class DrawingFrame extends JFrame implements Runnable{
 	    dHelper.setBackground(newColor);
 		dHelper.drawPanel.setBackground(newColor);
 	}
-	
-	public void saveDrawing(){
+
+    public void run() {
+        while (running) {
+            draw.update();
+        }
+    }
+
+    public void stop() {
+        running = false;
+    }
+
+    public void saveDrawing(){
 		if (!drawObjects.isEmpty()){
-			String name = null;
-			if (!doEdit){
+            String name;
+            if (!doEdit){
 				do {
 					name = JOptionPane.showInputDialog(this, "Enter a name for your drawing");
 				} while (name == null || name == "");
@@ -337,5 +326,7 @@ public class DrawingFrame extends JFrame implements Runnable{
     	dHelper.dispose();
     	dispose();
 	}
+
+    public enum DIRECTION {None, NE, NW, SE, SW}
 
 }
