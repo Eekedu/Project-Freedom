@@ -1,36 +1,31 @@
 package ca.eekedu.Project_Freedom;
-import static ca.eekedu.Project_Freedom.MainGame.*;
-import static ca.eekedu.Project_Freedom.DrawingFrame.*;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Iterator;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import ca.eekedu.Project_Freedom.Drawings.Drawing;
-import ca.eekedu.Project_Freedom.MainGame.GAMEMODE;
+import ca.eekedu.Project_Freedom.MainGame.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Iterator;
+
+import static ca.eekedu.Project_Freedom.DrawingFrame.*;
+import static ca.eekedu.Project_Freedom.MainGame.*;
 
 public class GraphicsGame extends JPanel {
-	int x = 0; int y = 0;
+	private static final long serialVersionUID = -5342794367022521148L;
+	int x = 0;
+	int y = 0;
 	float scale;
 	JScrollPane inventory;
 	JPanel inventoryPanel = new JPanel();
+
 	GraphicsGame(){
 		setForeground(new Color(0, 0, 0));
 		scale();
 	}
-	
-	private static final long serialVersionUID = -5342794367022521148L;
 
 	public void update(){
 		repaint();
@@ -46,17 +41,22 @@ public class GraphicsGame extends JPanel {
 				buttonY += 100;
 				buttonX = 0;
 			}
+			DrawingInvent panel = new DrawingInvent(drawing.screenshot.getScaledInstance(200, 100, RenderingHints.KEY_ANTIALIASING.hashCode()));
+			panel.setToolTipText(drawing.drawingName);
+			panel.setBounds(buttonX, buttonY, 200, 100);
+			panel.setLayout(new BorderLayout());
 			JButton button = new JButton();
-			button.setIcon(new ImageIcon(drawing.screenshot.getScaledInstance(200, 100, RenderingHints.KEY_ANTIALIASING.hashCode())));
-			button.setToolTipText(drawing.drawingName);
 			button.setContentAreaFilled(false);
-			button.setBounds(buttonX, buttonY, 200, 100);
+			button.setText("EDIT");
 			button.setFocusable(false);
 			ButtonClick btnCL = new ButtonClick();
 			btnCL.drawing = drawing;
 			btnCL.pos = keyIt.next();
 			button.addActionListener(btnCL);
-			inventoryPanel.add(button);
+
+			panel.addMouseListener(new myAdapter(panel, button));
+
+			inventoryPanel.add(panel);
 			buttonX += 200;
 		}
 		inventory = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -71,7 +71,11 @@ public class GraphicsGame extends JPanel {
 	}
 	
 	public void scale(){
-		scale = RESOLUTION_WIDTH / RESOLUTION_HEIGHT;
+		if (RESOLUTION_HEIGHT != 0) {
+			scale = RESOLUTION_WIDTH / RESOLUTION_HEIGHT;
+		} else {
+			scale = 1;
+		}
 	}
 	
 	protected void paintComponent(Graphics g){
@@ -114,7 +118,44 @@ public class GraphicsGame extends JPanel {
             x += g2.getFontMetrics().getHeight() * 10.5;
         }
     }
-	
+
+	public class DrawingInvent extends JPanel {
+		Image myImage;
+
+		DrawingInvent(Image image) {
+			myImage = image;
+		}
+
+		protected void paintComponent(Graphics g) {
+			g.drawImage(myImage, 0, 0, getWidth(), getHeight(), this);
+		}
+	}
+
+	public class myAdapter extends MouseAdapter {
+		JButton button;
+		JPanel panel;
+
+		myAdapter(JPanel panel, JButton button) {
+			super();
+			this.panel = panel;
+			this.button = button;
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			panel.add(button, BorderLayout.SOUTH);
+			revalidate();
+			repaint();
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			panel.remove(button);
+			revalidate();
+			repaint();
+		}
+	}
+
 	public class ButtonClick implements ActionListener{
 		Drawing drawing;
 		int pos;
