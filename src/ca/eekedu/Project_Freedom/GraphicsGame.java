@@ -11,7 +11,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
 
-import static ca.eekedu.Project_Freedom.DrawingFrame.*;
+import static ca.eekedu.Project_Freedom.DrawingFrame.mouseX;
+import static ca.eekedu.Project_Freedom.DrawingFrame.mouseY;
 import static ca.eekedu.Project_Freedom.MainGame.*;
 
 public class GraphicsGame extends JPanel {
@@ -51,12 +52,12 @@ public class GraphicsGame extends JPanel {
             JButton buttonE = new JButton("EDIT");
             buttonE.setContentAreaFilled(false);
             buttonE.setFocusable(false);
-            buttonE.addActionListener(new ButtonClick(drawing, id, 'e'));
+            buttonE.addActionListener(new ButtonClick(id, 'e'));
 
             JButton buttonD = new JButton("DELETE");
             buttonD.setContentAreaFilled(false);
             buttonD.setFocusable(false);
-            buttonD.addActionListener(new ButtonClick(drawing, id, 'd'));
+            buttonD.addActionListener(new ButtonClick(id, 'd'));
 
             JPanel holder = new JPanel();
             holder.add(buttonE);
@@ -90,8 +91,8 @@ public class GraphicsGame extends JPanel {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		g2.scale(scale, scale);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		Font font = new Font("Serif", Font.PLAIN, 18);
+        //g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Font font = new Font("Serif", Font.PLAIN, 18);
 		g2.setFont(font);
 		g2.setColor(new Color(45, 45, 45));
 		g2.fillRoundRect(x, y, 100, 100, 25, 25);
@@ -136,8 +137,9 @@ public class GraphicsGame extends JPanel {
 
 		protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            //g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.drawImage(myImage, 0, 0, getWidth(), getHeight(), this);
+            g2.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
         }
     }
 
@@ -170,13 +172,11 @@ public class GraphicsGame extends JPanel {
 	}
 
 	public class ButtonClick implements ActionListener{
-		Drawing drawing;
 		int pos;
 		char type;
 
-		ButtonClick(Drawing drawing, int pos, char type) {
-			super();
-			this.drawing = drawing;
+        ButtonClick(int pos, char type) {
+            super();
 			this.pos = pos;
 			this.type = type;
 		}
@@ -186,18 +186,10 @@ public class GraphicsGame extends JPanel {
 			try {
 				switch (type) {
 					case 'e': {
-						remove(inventory);
-						inventory = null;
-						mainGame.revalidate();
-						mainGame.repaint();
-						dHelper = new DrawHelperFrame();
-						MainGame.draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT, drawing.objects);
-						MainGame.draw.curDrawingIndex = pos;
-						drawing = null;
-						mode = GAMEMODE.Draw;
-						getBackColor();
-						drawThread = new Thread(MainGame.draw);
-						drawThread.start();
+                        remove(inventory);
+                        revalidate();
+                        repaint();
+                        doDraw(pos);
                         break;
                     }
                     case 'd': {

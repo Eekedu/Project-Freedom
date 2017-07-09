@@ -20,15 +20,14 @@ public class DrawingFrame extends JFrame implements Runnable{
     public static boolean pressed = false;
     public static boolean center = false;
     public static DIRECTION dir = DIRECTION.None;
-	public static GraphicsDrawing draw = new GraphicsDrawing();
-	public static Robot mouseRobot = null;
+    public static GraphicsDrawing drawer = new GraphicsDrawing();
+    public static Robot mouseRobot = null;
 	public static HashMap<Integer, DrawObject> drawObjects = new HashMap<Integer, DrawObject>();
     static int startY = 0;
     static int mouseY = 0;
     public volatile boolean running = true;
     public boolean doEdit = false;
 	public int curDrawingIndex = 0;
-	public int drawingCount = 0;
     Cursor customCurs;
 
     DrawingFrame (int width, int height) throws Exception{
@@ -40,8 +39,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 		setSize(width, height);
 		setLocation(0, 0);
 		setBackground(new Color(255, 255, 255, 0));
-		add(draw);
-		setVisible(true);
+        add(drawer);
+        setVisible(true);
 		toFront();
         drawObjects = new HashMap<>();
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -171,7 +170,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 						drawingCount++;
 						pressed = false;
 						mousePos();
-						dHelper.setLocation(1, 1);
+                        drawer.update();
+                        dHelper.setLocation(1, 1);
 						dHelper.setSize(1, 1);
 					} else {
 						dHelper.setLocation(1, 1);
@@ -291,8 +291,9 @@ public class DrawingFrame extends JFrame implements Runnable{
 	}
 
     public void run() {
+
         while (running) {
-            draw.update();
+            drawer.update();
         }
     }
 
@@ -312,8 +313,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 			}
 			BufferedImage screenshot = new BufferedImage(draw.getWidth(), draw.getHeight(), BufferedImage.TYPE_INT_ARGB);
 	    	Graphics2D g2 = screenshot.createGraphics();
-	    	draw.paint(g2);
-			Drawing drawing = new Drawing(name, screenshot, drawObjects);
+            drawer.paint(g2);
+            Drawing drawing = new Drawing(name, screenshot, drawObjects);
 			if (doEdit){
 				drawingsList.replace(curDrawingIndex, drawing);
 			} else {

@@ -76,14 +76,9 @@ public class MainGame extends JFrame{
 				if (e.getKeyCode() == keybinds.get("CHAR_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
 						e.getKeyCode() == keybinds.get("CHAR_LEFT") || e.getKeyCode() == keybinds.get("CHAR_RIGHT")){
 					keysPressed.put(e.getKeyCode(), 0);
-				} else if (e.getKeyCode() == keybinds.get("DO_DRAW")){
+				} else if (e.getKeyCode() == keybinds.get("DO_DRAW") && graphics.inventory == null) {
 					try {
-						dHelper = new DrawHelperFrame();
-						draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
-						mode = GAMEMODE.Draw;
-						getBackColor();
-						drawThread = new Thread(draw);
-						drawThread.start();
+						doDraw(-1);
 					} catch (Exception e1) {
 						System.out.println("Ooops Something went wrong!");
 
@@ -106,6 +101,26 @@ public class MainGame extends JFrame{
 
 	}
 
+	public static void doDraw(int pos) throws Exception {
+		dHelper = new DrawHelperFrame();
+		if (pos == -1) {
+			draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
+		} else {
+			draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT, drawingsList.get(pos).objects);
+			draw.curDrawingIndex = pos;
+			graphics.inventory = null;
+		}
+		mode = GAMEMODE.Draw;
+		getBackColor();
+		SwingWorker<Thread, Runnable> run = new SwingWorker<Thread, Runnable>() {
+			@Override
+			protected Thread doInBackground() throws Exception {
+				return new Thread(draw);
+			}
+		};
+		run.execute();
+	}
+
 	public static void main(String[] args) throws AWTException {
 		Dimension system_resolution = Toolkit.getDefaultToolkit().getScreenSize();
 		SYSTEM_RES_WIDTH = system_resolution.width;
@@ -117,15 +132,17 @@ public class MainGame extends JFrame{
 
 		ActionListener updateTimer = e -> {
 			{
-				graphics.update();
-				if (draw != null){
-					if (!draw.isVisible()){
-						dHelper = null;
-						draw.stop();
-						draw = null;
+				if (graphics.inventory == null) {
+					graphics.update();
+					if (draw != null) {
+						if (!draw.isVisible()) {
+							dHelper = null;
+							draw.stop();
+							draw = null;
+						}
 					}
+					checkControls();
 				}
-				checkControls();
 			}
 		};
 
