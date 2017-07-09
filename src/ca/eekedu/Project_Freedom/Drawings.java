@@ -31,6 +31,8 @@ public class Drawings extends HashMap<Integer, Drawing> {
 			Point endPoints = new Point(0, 0);
 			Color color = new Color(0, 0, 0);
 
+			DrawObject() {
+			}
 			DrawObject(DRAWMODE type, Point position, Point endPoints, Color color) {
 				this.type = type; this.position = position; this.endPoints = endPoints; this.color = color;
 			}

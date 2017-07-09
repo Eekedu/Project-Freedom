@@ -45,18 +45,29 @@ public class GraphicsGame extends JPanel {
 			panel.setToolTipText(drawing.drawingName);
 			panel.setBounds(buttonX, buttonY, 200, 100);
 			panel.setLayout(new BorderLayout());
-			JButton button = new JButton("EDIT");
-			button.setContentAreaFilled(false);
-			button.setFocusable(false);
-			button.addActionListener(new ButtonClick(drawing, keyIt.next(), 'e'));
 
-			panel.addMouseListener(new myAdapter(panel, button));
+            int id = keyIt.next();
+
+            JButton buttonE = new JButton("EDIT");
+            buttonE.setContentAreaFilled(false);
+            buttonE.setFocusable(false);
+            buttonE.addActionListener(new ButtonClick(drawing, id, 'e'));
+
+            JButton buttonD = new JButton("DELETE");
+            buttonD.setContentAreaFilled(false);
+            buttonD.setFocusable(false);
+            buttonD.addActionListener(new ButtonClick(drawing, id, 'd'));
+
+            JPanel holder = new JPanel();
+            holder.add(buttonE);
+            holder.add(buttonD);
+            panel.addMouseListener(new myAdapter(panel, holder));
 
 			inventoryPanel.add(panel);
-			inventoryPanel.addMouseListener(new myAdapter(panel, button, 1));
-			buttonX += 200;
-		}
-		inventory = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            inventoryPanel.addMouseListener(new myAdapter(panel, holder, 1));
+            buttonX += 200;
+        }
+        inventory = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		inventory.setViewportView(inventoryPanel);
 		inventory.setBounds(RESOLUTION_WIDTH - 400, 24, 400, RESOLUTION_HEIGHT - 24);
 		inventory.setFocusable(false);
@@ -124,35 +135,37 @@ public class GraphicsGame extends JPanel {
 		}
 
 		protected void paintComponent(Graphics g) {
-			g.drawImage(myImage, 0, 0, getWidth(), getHeight(), this);
-		}
-	}
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.drawImage(myImage, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
 
 	public class myAdapter extends MouseAdapter {
-		JButton button;
 		JPanel panel;
-		int type;
+        JPanel holder;
+        int type;
 
-		myAdapter(JPanel panel, JButton button) {
-			this(panel, button, 0);
-		}
+        myAdapter(JPanel panel, JPanel holder) {
+            this(panel, holder, 0);
+        }
 
-		myAdapter(JPanel panel, JButton button, int type) {
-			super();
-			this.panel = panel;
-			this.button = button;
-			this.type = type;
-		}
+        myAdapter(JPanel panel, JPanel holder, int type) {
+            super();
+            this.panel = panel;
+            this.holder = holder;
+            this.type = type;
+        }
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
 			if (type == 0) {
-				panel.add(button, BorderLayout.SOUTH);
-			} else {
-				panel.remove(button);
-			}
-			revalidate();
-			repaint();
+                panel.add(holder, BorderLayout.SOUTH);
+            } else {
+                panel.remove(holder);
+            }
+            revalidate();
+            repaint();
 		}
 	}
 
@@ -185,11 +198,21 @@ public class GraphicsGame extends JPanel {
 						getBackColor();
 						drawThread = new Thread(MainGame.draw);
 						drawThread.start();
-					}
-				}
-				
-			} catch (Exception e1) {
-				System.out.println("Something went wrong!");
+                        break;
+                    }
+                    case 'd': {
+                        drawingsList.remove(pos);
+                        remove(inventory);
+                        inventory = null;
+                        revalidate();
+                        repaint();
+                        createInventory();
+                        break;
+                    }
+                }
+
+            } catch (Exception e1) {
+                System.out.println("Something went wrong!");
 			}
 		}
 	}
