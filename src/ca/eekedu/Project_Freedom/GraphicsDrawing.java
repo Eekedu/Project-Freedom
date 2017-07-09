@@ -15,7 +15,7 @@ public class GraphicsDrawing extends JPanel {
 
 	GraphicsDrawing() {
 		setOpaque(false);
-		setBackground(new Color(255, 255, 255, 0));
+		setBackground(new Color(255, 255, 255, 1));
 	}
 	
 	public void update(){

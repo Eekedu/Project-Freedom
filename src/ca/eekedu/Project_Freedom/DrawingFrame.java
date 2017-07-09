@@ -38,8 +38,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 		setUndecorated(true);
 		setSize(width, height);
 		setLocation(0, 0);
-		setBackground(new Color(255, 255, 255, 0));
-        add(drawer);
+		setBackground(new Color(255, 255, 255, 1));
+		add(drawer);
         setVisible(true);
 		toFront();
         drawObjects = new HashMap<>();
@@ -219,7 +219,6 @@ public class DrawingFrame extends JFrame implements Runnable{
         drawObjects = new HashMap<>();
 		for (DrawObject object : objects.values()) {
 			drawObjects.put(drawObjects.size(), new DrawObject(object.type, object.position, object.endPoints, object.color));
-			drawingCount++;
 		}
 		doEdit = true;
 	}
@@ -290,12 +289,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 		dHelper.drawPanel.setBackground(newColor);
 	}
 
-    public void run() {
-
-        while (running) {
-            drawer.update();
-        }
-    }
+	public void run() {
+	}
 
     public void stop() {
         running = false;
