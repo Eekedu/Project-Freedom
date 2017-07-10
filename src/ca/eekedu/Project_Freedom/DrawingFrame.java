@@ -88,7 +88,22 @@ public class DrawingFrame extends JFrame implements Runnable{
 					}
 				} else if (e.getKeyCode() == keybinds.get("CENTER_B")){
 					center = false;
-					mouseRobot.mouseMove(mouseX, mouseY);
+                    if (dir == DIRECTION.NE) {
+                        int prevY = startY;
+                        startY = mouseY;
+                        mouseY = prevY;
+                    } else if (dir == DIRECTION.SW) {
+                        int prevX = startX;
+                        startX = mouseX;
+                        mouseX = prevX;
+                    } else if (dir == DIRECTION.NW) {
+                        int prevX = startX, prevY = startY;
+                        startX = mouseX;
+                        startY = mouseY;
+                        mouseX = prevX;
+                        mouseY = prevY;
+                    }
+                    mouseRobot.mouseMove(mouseX, mouseY);
 					mousePos();
 				}
 			}
@@ -157,7 +172,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 							dHelper.setSize(Math.abs(obj.endPoints.x - obj.position.x), Math.abs(obj.endPoints.y - obj.position.y));
 							pressed = true;
 							center = true;
-							mousePos();
+                            dir = DIRECTION.SE;
+                            mousePos();
 						}
 					}
 				}
@@ -243,8 +259,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 			mouseY = p.y;
 		}
 		if (pressed){
-
-			if (mouseY < startY){
+            DIRECTION prev = dir;
+            if (mouseY < startY){
 				if (mouseX < startX){
 					dir = DIRECTION.NW;
 				} else {
@@ -283,7 +299,10 @@ public class DrawingFrame extends JFrame implements Runnable{
 					}
 				}
 			}
-			dHelper.repaint();
+            if (center) {
+                dir = prev;
+            }
+            dHelper.repaint();
 		}
 	}
 	

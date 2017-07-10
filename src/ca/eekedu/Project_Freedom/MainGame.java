@@ -12,8 +12,8 @@ import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 public class MainGame extends JFrame implements Runnable {
 	
 	private static final long serialVersionUID = -2787039850560314750L;
-	
-	public static HashMap<Integer, Integer> keysPressed = new HashMap<Integer, Integer>();
+
+	public static HashMap<Integer, Integer> keysPressed = new HashMap<>();
 	public static MainGame mainGame = null;
 	public static GraphicsGame graphics = new GraphicsGame();
 	public static KeyBinds keybinds = new KeyBinds();
