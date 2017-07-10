@@ -8,8 +8,6 @@ import java.util.HashMap;
 
 public class KeyBinds extends HashMap<String, Integer> {
 
-	private static final long serialVersionUID = -3262002073024191000L;
-
 	KeyBinds() {
 		File keybinds = new File("keybinds.cfg");
 		if (!keybinds.exists()){

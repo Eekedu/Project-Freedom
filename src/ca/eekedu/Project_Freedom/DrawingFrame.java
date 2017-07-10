@@ -12,8 +12,6 @@ import java.util.HashMap;
 import static ca.eekedu.Project_Freedom.MainGame.*;
 
 public class DrawingFrame extends JFrame implements Runnable{
-	
-	private static final long serialVersionUID = 1644654621927813840L;
 
     public static int startX = 0;
     public static int mouseX = 0;
@@ -190,7 +188,6 @@ public class DrawingFrame extends JFrame implements Runnable{
 						endPos = new Point(mouseX, mouseY);
 						DrawObject drawObject = new DrawObject(drawMode, startPos, endPos, drawColor);
 						drawObjects.put(drawObjects.size(), drawObject);
-						drawingCount++;
 						pressed = false;
 						mousePos();
                         drawer.update();
@@ -335,7 +332,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 			if (doEdit){
 				drawingsList.replace(curDrawingIndex, drawing);
 			} else {
-				drawingsList.put(curDrawingIndex, drawing);
+				drawingsList.put(drawingCount, drawing);
 				drawingCount++;
 			}
 		}

@@ -16,7 +16,6 @@ import static ca.eekedu.Project_Freedom.DrawingFrame.mouseY;
 import static ca.eekedu.Project_Freedom.MainGame.*;
 
 public class GraphicsGame extends JPanel {
-	private static final long serialVersionUID = -5342794367022521148L;
 	int x = 0;
 	int y = 0;
 	float scale;
@@ -45,12 +44,12 @@ public class GraphicsGame extends JPanel {
 					buttonY += 100;
 					buttonX = 1;
 				}
+				int id = keyIt.next();
+
 				DrawingInvent panel = new DrawingInvent(drawing.screenshot.getScaledInstance(200, 100, RenderingHints.KEY_ANTIALIASING.hashCode()));
 				panel.setToolTipText(drawing.drawingName);
 				panel.setBounds(buttonX, buttonY, 200, 100);
 				panel.setLayout(new BorderLayout());
-
-				int id = keyIt.next();
 
 				JButton buttonE = new JButton("EDIT");
 				buttonE.setFocusable(false);
@@ -79,7 +78,6 @@ public class GraphicsGame extends JPanel {
 		inventory.setFocusable(false);
 		setLayout(null);
 		add(inventory);
-		inventory.requestFocus();
 		inventory.revalidate();
 		inventory.repaint();
 		revalidate();

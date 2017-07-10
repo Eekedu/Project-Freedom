@@ -9,8 +9,6 @@ import static ca.eekedu.Project_Freedom.MainGame.drawColor;
 import static ca.eekedu.Project_Freedom.MainGame.drawMode;
 
 public class DrawHelperFrame extends JFrame implements Runnable {
-
-    private static final long serialVersionUID = -4898785221895216109L;
 	
 	DrawPanel drawPanel = new DrawPanel();
 

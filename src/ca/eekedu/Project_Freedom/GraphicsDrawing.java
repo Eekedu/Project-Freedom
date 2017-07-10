@@ -10,8 +10,6 @@ import static ca.eekedu.Project_Freedom.MainGame.SYSTEM_MAXDRAW_HEIGHT;
 import static ca.eekedu.Project_Freedom.MainGame.SYSTEM_MAXDRAW_WIDTH;
 
 public class GraphicsDrawing extends JPanel {
-	
-	private static final long serialVersionUID = -3576483361126717271L;
 
 	GraphicsDrawing() {
 		setOpaque(false);

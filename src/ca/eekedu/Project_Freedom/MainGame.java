@@ -10,8 +10,6 @@ import java.util.HashMap;
 import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
 public class MainGame extends JFrame implements Runnable {
-	
-	private static final long serialVersionUID = -2787039850560314750L;
 
 	public static HashMap<Integer, Integer> keysPressed = new HashMap<>();
 	public static MainGame mainGame = null;
@@ -131,6 +129,11 @@ public class MainGame extends JFrame implements Runnable {
 
 		ActionListener updateTimer = e -> {
 			{
+				if (!mainGame.isVisible() && update.isRunning()) {
+					mainGame.setVisible(true);
+					JOptionPane.showMessageDialog(mainGame, "Game window had a problem starting right away",
+							"Minor error", JOptionPane.PLAIN_MESSAGE);
+				}
 				if (graphics.inventory == null) {
 					graphics.update();
 					if (mode == GAMEMODE.Game) {
