@@ -10,8 +10,6 @@ import static ca.eekedu.Project_Freedom.MainGame.SYSTEM_MAXDRAW_HEIGHT;
 import static ca.eekedu.Project_Freedom.MainGame.SYSTEM_MAXDRAW_WIDTH;
 
 public class GraphicsDrawing extends JPanel {
-	
-	private static final long serialVersionUID = -3576483361126717271L;
 
 	GraphicsDrawing() {
 		setOpaque(false);
@@ -34,7 +32,10 @@ public class GraphicsDrawing extends JPanel {
 		for(DrawObject object: drawObjects.values()){
 			g2.setColor(object.color);
 			switch (object.type) {
-				case Line: g2.drawLine(object.position.x, object.position.y, object.endPoints.x, object.endPoints.y); break;
+				case Line:
+				case FreeDraw:
+					g2.drawLine(object.position.x, object.position.y, object.endPoints.x, object.endPoints.y);
+					break;
 				case EmptyRect: Draw(g2, 'R', object.position, object.endPoints, false); break;
 				case FilledRect: Draw(g2, 'R', object.position, object.endPoints, true); break;
 				case Oval: Draw(g2, 'O', object.position, object.endPoints, false); break;

@@ -10,8 +10,6 @@ import java.util.HashMap;
 import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
 public class MainGame extends JFrame implements Runnable {
-	
-	private static final long serialVersionUID = -2787039850560314750L;
 
 	public static HashMap<Integer, Integer> keysPressed = new HashMap<>();
 	public static MainGame mainGame = null;
@@ -59,7 +57,7 @@ public class MainGame extends JFrame implements Runnable {
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
 					update.stop();
 					dispose();
-				} else if (keysPressed.containsKey(KeyEvent.VK_SHIFT)) {
+				} else if (keysPressed.containsKey(KeyEvent.VK_SHIFT) && graphics.inventory == null) {
 					if (e.getKeyCode() == keybinds.get("SIZE_UP")){
 						RESOLUTION_WIDTH = 1280;
 						RESOLUTION_HEIGHT = 800;
@@ -131,6 +129,11 @@ public class MainGame extends JFrame implements Runnable {
 
 		ActionListener updateTimer = e -> {
 			{
+				if (!mainGame.isVisible() && update.isRunning()) {
+					mainGame.setVisible(true);
+					JOptionPane.showMessageDialog(mainGame, "Game window had a problem starting right away",
+							"Minor error", JOptionPane.PLAIN_MESSAGE);
+				}
 				if (graphics.inventory == null) {
 					graphics.update();
 					if (mode == GAMEMODE.Game) {
@@ -187,7 +190,7 @@ public class MainGame extends JFrame implements Runnable {
 	public enum GAMEMODE {Menu, Game, Draw}
 
 	public enum DRAWMODE {
-		Line, EmptyRect, FilledRect, Oval, FilledOval;
+		Line, FreeDraw, EmptyRect, FilledRect, Oval, FilledOval;
 		private static DRAWMODE[] vals = values();
 
 		public DRAWMODE next() {

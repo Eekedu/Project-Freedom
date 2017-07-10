@@ -12,8 +12,6 @@ import java.util.HashMap;
 import static ca.eekedu.Project_Freedom.MainGame.*;
 
 public class DrawingFrame extends JFrame implements Runnable{
-	
-	private static final long serialVersionUID = 1644654621927813840L;
 
     public static int startX = 0;
     public static int mouseX = 0;
@@ -183,14 +181,13 @@ public class DrawingFrame extends JFrame implements Runnable{
 		addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == keybinds.get("MOUSE_P")) {
-					if (pressed){
-                        Point startPos;
+					if (pressed && drawMode != DRAWMODE.FreeDraw) {
+						Point startPos;
                         Point endPos;
                         startPos = new Point(startX, startY);
 						endPos = new Point(mouseX, mouseY);
 						DrawObject drawObject = new DrawObject(drawMode, startPos, endPos, drawColor);
 						drawObjects.put(drawObjects.size(), drawObject);
-						drawingCount++;
 						pressed = false;
 						mousePos();
                         drawer.update();
@@ -204,10 +201,13 @@ public class DrawingFrame extends JFrame implements Runnable{
 			}
 			public void mousePressed(MouseEvent e) {
 				if (e.getButton() == keybinds.get("MOUSE_P")) {
-					if (!pressed){
+					if (!pressed && drawMode != DRAWMODE.FreeDraw) {
 						pressed = true;
 						startX = mouseX; startY = mouseY;
 						mousePos();
+					} else if (drawMode == DRAWMODE.FreeDraw) {
+						startX = mouseX;
+						startY = mouseY;
 					}
 				}
 			}
@@ -222,6 +222,13 @@ public class DrawingFrame extends JFrame implements Runnable{
 			}
 			public void mouseDragged(MouseEvent e) {
 				mousePos();
+				if (drawMode == DRAWMODE.FreeDraw) {
+					DrawObject object = new DrawObject(drawMode, new Point(startX, startY), new Point(mouseX, mouseY), drawColor);
+					drawObjects.put(drawObjects.size(), object);
+					drawer.update();
+					startX = mouseX;
+					startY = mouseY;
+				}
 			}
 		});
 
@@ -275,7 +282,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 			} else {
 				dir = DIRECTION.None;
 			}
-			if (dir != DIRECTION.None){
+			if (dir != DIRECTION.None && drawMode != DRAWMODE.FreeDraw) {
 				switch (dir){
 					case NE: {
 						dHelper.setLocation(startX, mouseY);
@@ -324,7 +331,7 @@ public class DrawingFrame extends JFrame implements Runnable{
             if (!doEdit){
 				do {
 					name = JOptionPane.showInputDialog(this, "Enter a name for your drawing");
-				} while (name == null || name == "");
+				} while (name == null || name.equals(""));
 			} else {
 				name = drawingsList.get(curDrawingIndex).drawingName;
 			}
@@ -335,7 +342,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 			if (doEdit){
 				drawingsList.replace(curDrawingIndex, drawing);
 			} else {
-				drawingsList.put(curDrawingIndex, drawing);
+				drawingsList.put(drawingCount, drawing);
 				drawingCount++;
 			}
 		}

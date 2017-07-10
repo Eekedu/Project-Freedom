@@ -9,14 +9,13 @@ import static ca.eekedu.Project_Freedom.MainGame.drawColor;
 import static ca.eekedu.Project_Freedom.MainGame.drawMode;
 
 public class DrawHelperFrame extends JFrame implements Runnable {
-
-    private static final long serialVersionUID = -4898785221895216109L;
 	
 	DrawPanel drawPanel = new DrawPanel();
 
 	public DrawHelperFrame() {
 		add(drawPanel);
-		setFocusable(false);
+        setTitle("I'm the helper window :3");
+        setFocusable(false);
 		setUndecorated(true);
         setOpacity(0.25F);
         setSize(1, 1);

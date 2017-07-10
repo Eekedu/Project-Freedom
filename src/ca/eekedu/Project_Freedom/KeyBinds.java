@@ -8,8 +8,6 @@ import java.util.HashMap;
 
 public class KeyBinds extends HashMap<String, Integer> {
 
-	private static final long serialVersionUID = -3262002073024191000L;
-
 	KeyBinds() {
 		File keybinds = new File("keybinds.cfg");
 		if (!keybinds.exists()){
@@ -53,7 +51,7 @@ public class KeyBinds extends HashMap<String, Integer> {
 					case "SIZE_UP": case "SIZE_DOWN": case "DO_DRAW": case "CLICK_M": 
 					case "COLOR_C": case "COLOR_B": case "COLOR_D": case "MOUSE_P": 
 					case "CENTER_B": case "SELECT_O": case "INVENT_B": {
-						if (key[0] == "MOUSE_P"){
+						if (key[0].equals("MOUSE_P")) {
 							if (Integer.decode(key[1]) < 1 || Integer.decode(key[1]) > 3){
 								break;
 							}
@@ -78,7 +76,9 @@ public class KeyBinds extends HashMap<String, Integer> {
 			try {
 				populate_defaults(keybinds);
 				read(keybinds);
-			} catch (Exception e1) {}
+			} catch (Exception e1) {
+				System.out.println(e1.getMessage());
+			}
 		}
 	}
 	

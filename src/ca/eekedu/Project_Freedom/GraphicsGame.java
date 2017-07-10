@@ -16,7 +16,6 @@ import static ca.eekedu.Project_Freedom.DrawingFrame.mouseY;
 import static ca.eekedu.Project_Freedom.MainGame.*;
 
 public class GraphicsGame extends JPanel {
-	private static final long serialVersionUID = -5342794367022521148L;
 	int x = 0;
 	int y = 0;
 	float scale;
@@ -33,24 +32,37 @@ public class GraphicsGame extends JPanel {
 	}
 	
 	public void createInventory(){
-		inventoryPanel = new JPanel();
+		inventoryPanel = new JPanel() {
+			protected void paintComponent(Graphics g) {
+				Graphics2D g2 = (Graphics2D) g;
+				Font font = new Font("Serif", Font.PLAIN, 18);
+				g2.setFont(font);
+				g2.fillRect(0, 0, 419, 22);
+				if (drawingsList.isEmpty()) {
+					g2.drawLine(1, 23, getWidth() - 2, getHeight() - 2);
+					g2.drawLine(getWidth() - 2, 23, 1, getHeight() - 2);
+				}
+				g2.setColor(Color.WHITE);
+				g2.drawString("Inventory:", 10, 16);
+			}
+		};
 		inventoryPanel.setLayout(null);
 		if (!drawingsList.isEmpty()) {
-			inventoryPanel.setPreferredSize(new Dimension(420, (drawingsList.size() + 1) * 50));
+			inventoryPanel.setPreferredSize(new Dimension(420, ((drawingsList.size() + 1) * 50) + 23));
 			int buttonX = 1;
-			int buttonY = 0;
+			int buttonY = 23;
 			Iterator<Integer> keyIt = drawingsList.keySet().iterator();
 			for (Drawing drawing : drawingsList.values()) {
 				if (buttonX > 399) {
 					buttonY += 100;
 					buttonX = 1;
 				}
+				int id = keyIt.next();
+
 				DrawingInvent panel = new DrawingInvent(drawing.screenshot.getScaledInstance(200, 100, RenderingHints.KEY_ANTIALIASING.hashCode()));
 				panel.setToolTipText(drawing.drawingName);
 				panel.setBounds(buttonX, buttonY, 200, 100);
 				panel.setLayout(new BorderLayout());
-
-				int id = keyIt.next();
 
 				JButton buttonE = new JButton("EDIT");
 				buttonE.setFocusable(false);
@@ -79,7 +91,6 @@ public class GraphicsGame extends JPanel {
 		inventory.setFocusable(false);
 		setLayout(null);
 		add(inventory);
-		inventory.requestFocus();
 		inventory.revalidate();
 		inventory.repaint();
 		revalidate();
@@ -119,13 +130,15 @@ public class GraphicsGame extends JPanel {
 								(float)p.distance(dHelper.getWidth(), dHelper.getHeight()): 
 									dHelper.getWidth() + ", " + dHelper.getHeight())
 					, -50, 18);
-			} catch (NullPointerException e){}
+			} catch (NullPointerException e) {
+				System.out.println(e.getMessage());
+			}
 		} else {
 			if (!drawingsList.isEmpty()){
 				drawtabString(g2, "\t# of Drawings: " + drawingsList.size(), -50, 18);
 			}
 		}
-		
+
 	}
 	
 	private void drawtabString(Graphics2D g2, String text, int x, int y) {

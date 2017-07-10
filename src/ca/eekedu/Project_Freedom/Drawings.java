@@ -6,12 +6,11 @@ import org.dyn4j.dynamics.Body;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import static ca.eekedu.Project_Freedom.MainGame.DRAWMODE;
 
-public class Drawings extends HashMap<Integer, Drawing> {
-
-	private static final long serialVersionUID = -4802139613225189806L;
+public class Drawings extends TreeMap<Integer, Drawing> {
 
     public static class Drawing extends Body {
 
