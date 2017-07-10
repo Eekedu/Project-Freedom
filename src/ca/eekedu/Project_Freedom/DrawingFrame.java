@@ -17,15 +17,15 @@ public class DrawingFrame extends JFrame implements Runnable{
 
     public static int startX = 0;
     public static int mouseX = 0;
-    public static boolean pressed = false;
+	public static int startY = 0;
+	public static int mouseY = 0;
+	public static boolean pressed = false;
     public static boolean center = false;
-    public static DIRECTION dir = DIRECTION.None;
+	public static boolean colorPick = false;
+	public static DIRECTION dir = DIRECTION.None;
     public static GraphicsDrawing drawer = new GraphicsDrawing();
     public static Robot mouseRobot = null;
 	public static HashMap<Integer, DrawObject> drawObjects = new HashMap<Integer, DrawObject>();
-    static int startY = 0;
-    static int mouseY = 0;
-    public volatile boolean running = true;
     public boolean doEdit = false;
 	public int curDrawingIndex = 0;
     Cursor customCurs;
@@ -39,6 +39,9 @@ public class DrawingFrame extends JFrame implements Runnable{
 		setSize(width, height);
 		setLocation(0, 0);
 		setBackground(new Color(255, 255, 255, 1));
+		if (!System.getProperty("os.name").contains("Windows")) {
+			setOpacity(0.5F);
+		}
 		add(drawer);
         setVisible(true);
 		toFront();
@@ -60,10 +63,12 @@ public class DrawingFrame extends JFrame implements Runnable{
 		addWindowFocusListener(new WindowFocusListener() {
 
 			public void windowLostFocus(WindowEvent e) {
-				mainGame.toFront();
-				if (dHelper != null){
-					dHelper.toFront();
-					toFront();
+				if (!colorPick) {
+					mainGame.toFront();
+					if (dHelper != null) {
+						dHelper.toFront();
+						toFront();
+					}
 				}
 			}
 			public void windowGainedFocus(WindowEvent e) {}
@@ -100,12 +105,14 @@ public class DrawingFrame extends JFrame implements Runnable{
 					mouseRobot.mousePress(16 / mouseMod);
 				} else if (e.getKeyCode() == keybinds.get("COLOR_C")){
 					Color prevColor = drawColor;
-					drawColor = JColorChooser.showDialog(getParent(), "Choose drawing color", drawColor);
+					colorPick = true;
+					drawColor = JColorChooser.showDialog(getFocusOwner(), "Choose drawing color", drawColor);
 					if (drawColor == null){
 						drawColor = prevColor;
 					} else {
 						getBackColor();
 					}
+					colorPick = false;
 				} else if (e.getKeyCode() == keybinds.get("COLOR_B")) {
 					drawColor = drawColor.brighter();
 					getBackColor();
@@ -292,10 +299,6 @@ public class DrawingFrame extends JFrame implements Runnable{
 	public void run() {
 	}
 
-    public void stop() {
-        running = false;
-    }
-
     public void saveDrawing(){
 		if (!drawObjects.isEmpty()){
             String name;
@@ -313,14 +316,15 @@ public class DrawingFrame extends JFrame implements Runnable{
 			if (doEdit){
 				drawingsList.replace(curDrawingIndex, drawing);
 			} else {
-				drawingsList.put(drawingCount, drawing);
+				drawingsList.put(curDrawingIndex, drawing);
 				drawingCount++;
 			}
 		}
     	mode = GAMEMODE.Game;
-    	running = false;
     	dHelper.dispose();
     	dispose();
+		mainGame.toFront();
+		mainGame.requestFocus();
 	}
 
     public enum DIRECTION {None, NE, NW, SE, SW}

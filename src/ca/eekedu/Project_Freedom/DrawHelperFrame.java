@@ -8,9 +8,9 @@ import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 import static ca.eekedu.Project_Freedom.MainGame.drawColor;
 import static ca.eekedu.Project_Freedom.MainGame.drawMode;
 
-public class DrawHelperFrame extends JFrame{
-	
-	private static final long serialVersionUID = -4898785221895216109L;
+public class DrawHelperFrame extends JFrame implements Runnable {
+
+    private static final long serialVersionUID = -4898785221895216109L;
 	
 	DrawPanel drawPanel = new DrawPanel();
 
@@ -18,7 +18,8 @@ public class DrawHelperFrame extends JFrame{
 		add(drawPanel);
 		setFocusable(false);
 		setUndecorated(true);
-		setSize(1, 1);
+        setOpacity(0.25F);
+        setSize(1, 1);
 		setLocation(1, 1);
 		setVisible(true);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -30,7 +31,10 @@ public class DrawHelperFrame extends JFrame{
 		});
 		
 	}
-	
+
+    public void run() {
+    }
+
 	public class DrawPanel extends JPanel {
 
 		private static final long serialVersionUID = 6689874781906933342L;
@@ -59,7 +63,7 @@ public class DrawHelperFrame extends JFrame{
 				}
 			}
 		}
-		
-	}
+
+    }
 
 }

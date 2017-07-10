@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
-public class MainGame extends JFrame{
+public class MainGame extends JFrame implements Runnable {
 	
 	private static final long serialVersionUID = -2787039850560314750L;
 	
@@ -23,7 +23,6 @@ public class MainGame extends JFrame{
 	public static DrawingFrame draw = null;
 	public static DrawHelperFrame dHelper = null;
 	public static Color drawColor = Color.RED;
-	public static Thread drawThread;
 	public static int drawingCount = 0;
 	static Timer update = new Timer(0, null);
 	static int RESOLUTION_WIDTH = 1080;
@@ -105,6 +104,7 @@ public class MainGame extends JFrame{
 		dHelper = new DrawHelperFrame();
 		if (pos == -1) {
 			draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT);
+			draw.curDrawingIndex = drawingCount;
 		} else {
 			draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT, drawingsList.get(pos).objects);
 			draw.curDrawingIndex = pos;
@@ -112,13 +112,12 @@ public class MainGame extends JFrame{
 		}
 		mode = GAMEMODE.Draw;
 		getBackColor();
-		SwingWorker<Thread, Runnable> run = new SwingWorker<Thread, Runnable>() {
-			@Override
-			protected Thread doInBackground() throws Exception {
-				return new Thread(draw);
-			}
-		};
+		MySwingWorker run = new MySwingWorker();
+		run.r = draw;
+		MySwingWorker run2 = new MySwingWorker();
+		run2.r = dHelper;
 		run.execute();
+		run2.execute();
 	}
 
 	public static void main(String[] args) throws AWTException {
@@ -134,10 +133,12 @@ public class MainGame extends JFrame{
 			{
 				if (graphics.inventory == null) {
 					graphics.update();
+					if (mode == GAMEMODE.Game) {
+						mainGame.requestFocus();
+					}
 					if (draw != null) {
 						if (!draw.isVisible()) {
 							dHelper = null;
-							draw.stop();
 							draw = null;
 						}
 					}
@@ -149,8 +150,9 @@ public class MainGame extends JFrame{
 		update = new Timer(5, updateTimer); //Smooth update of graphics, reduced lag
 		update.start();
 
-		while (update.isRunning() || draw != null || dHelper != null) {
-		}
+		MySwingWorker main = new MySwingWorker();
+		main.r = mainGame;
+		main.execute();
 
 	}
 
@@ -179,6 +181,9 @@ public class MainGame extends JFrame{
 		setLocation(posX, posY);
 	}
 
+	public void run() {
+	}
+
 	public enum GAMEMODE {Menu, Game, Draw}
 
 	public enum DRAWMODE {
@@ -197,6 +202,14 @@ public class MainGame extends JFrame{
 				return vals[vals.length - 1];
 			}
 			return vals[(this.ordinal()) - 1];
+		}
+	}
+
+	public static class MySwingWorker extends SwingWorker<Thread, Runnable> {
+		Runnable r;
+
+		protected Thread doInBackground() throws Exception {
+			return new Thread(r);
 		}
 	}
 

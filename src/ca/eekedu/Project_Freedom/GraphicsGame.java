@@ -35,46 +35,53 @@ public class GraphicsGame extends JPanel {
 	public void createInventory(){
 		inventoryPanel = new JPanel();
 		inventoryPanel.setLayout(null);
-		int buttonX = 0; int buttonY = 0;
-		Iterator<Integer> keyIt = drawingsList.keySet().iterator();
-		for (Drawing drawing: drawingsList.values()){
-			if (buttonX >  399){
-				buttonY += 100;
-				buttonX = 0;
+		if (!drawingsList.isEmpty()) {
+			inventoryPanel.setPreferredSize(new Dimension(420, (drawingsList.size() + 1) * 50));
+			int buttonX = 1;
+			int buttonY = 0;
+			Iterator<Integer> keyIt = drawingsList.keySet().iterator();
+			for (Drawing drawing : drawingsList.values()) {
+				if (buttonX > 399) {
+					buttonY += 100;
+					buttonX = 1;
+				}
+				DrawingInvent panel = new DrawingInvent(drawing.screenshot.getScaledInstance(200, 100, RenderingHints.KEY_ANTIALIASING.hashCode()));
+				panel.setToolTipText(drawing.drawingName);
+				panel.setBounds(buttonX, buttonY, 200, 100);
+				panel.setLayout(new BorderLayout());
+
+				int id = keyIt.next();
+
+				JButton buttonE = new JButton("EDIT");
+				buttonE.setFocusable(false);
+				buttonE.addActionListener(new ButtonClick(id, 'e'));
+				buttonE.setBackground(Color.WHITE);
+
+				JButton buttonD = new JButton("DELETE");
+				buttonD.setFocusable(false);
+				buttonD.addActionListener(new ButtonClick(id, 'd'));
+				buttonD.setBackground(Color.WHITE);
+
+				JPanel holder = new JPanel();
+				holder.add(buttonE);
+				holder.add(buttonD);
+				holder.setBackground(new Color(0, 0, 0, 0));
+				panel.addMouseListener(new myAdapter(panel, holder));
+
+				inventoryPanel.add(panel);
+				inventoryPanel.addMouseListener(new myAdapter(panel, holder, 1));
+				buttonX += 200;
 			}
-			DrawingInvent panel = new DrawingInvent(drawing.screenshot.getScaledInstance(200, 100, RenderingHints.KEY_ANTIALIASING.hashCode()));
-			panel.setToolTipText(drawing.drawingName);
-			panel.setBounds(buttonX, buttonY, 200, 100);
-			panel.setLayout(new BorderLayout());
-
-            int id = keyIt.next();
-
-            JButton buttonE = new JButton("EDIT");
-            buttonE.setContentAreaFilled(false);
-            buttonE.setFocusable(false);
-            buttonE.addActionListener(new ButtonClick(id, 'e'));
-
-            JButton buttonD = new JButton("DELETE");
-            buttonD.setContentAreaFilled(false);
-            buttonD.setFocusable(false);
-            buttonD.addActionListener(new ButtonClick(id, 'd'));
-
-            JPanel holder = new JPanel();
-            holder.add(buttonE);
-            holder.add(buttonD);
-            panel.addMouseListener(new myAdapter(panel, holder));
-
-			inventoryPanel.add(panel);
-            inventoryPanel.addMouseListener(new myAdapter(panel, holder, 1));
-            buttonX += 200;
-        }
-        inventory = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		}
+		inventory = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		inventory.setViewportView(inventoryPanel);
-		inventory.setBounds(RESOLUTION_WIDTH - 400, 24, 400, RESOLUTION_HEIGHT - 24);
+		inventory.setBounds(RESOLUTION_WIDTH - 420, 24, 420, RESOLUTION_HEIGHT - 24);
 		inventory.setFocusable(false);
 		setLayout(null);
 		add(inventory);
 		inventory.requestFocus();
+		inventory.revalidate();
+		inventory.repaint();
 		revalidate();
 		repaint();
 	}
