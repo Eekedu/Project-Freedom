@@ -16,8 +16,7 @@ import static ca.eekedu.Project_Freedom.DrawingFrame.mouseY;
 import static ca.eekedu.Project_Freedom.MainGame.*;
 
 public class GraphicsGame extends JPanel {
-	int x = 0;
-	int y = 0;
+
 	float scale;
 	JScrollPane inventory;
 	JPanel inventoryPanel = new JPanel();
@@ -89,6 +88,8 @@ public class GraphicsGame extends JPanel {
 		inventory.setViewportView(inventoryPanel);
 		inventory.setBounds(RESOLUTION_WIDTH - 420, 24, 420, RESOLUTION_HEIGHT - 24);
 		inventory.setFocusable(false);
+		inventory.setBackground(new Color(1F, 1F, 1F, 0.5F));
+		inventoryPanel.setBackground(new Color(1F, 1F, 1F, 0.5F));
 		setLayout(null);
 		add(inventory);
 		inventory.revalidate();
@@ -104,6 +105,11 @@ public class GraphicsGame extends JPanel {
 			scale = 1;
 		}
 	}
+
+	protected void render(Graphics2D g, SimulationBody body) {
+		// draw the object
+		body.render(g, scale, body.color);
+	}
 	
 	protected void paintComponent(Graphics g){
 		super.paintComponent(g);
@@ -112,8 +118,10 @@ public class GraphicsGame extends JPanel {
         //g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         Font font = new Font("Serif", Font.PLAIN, 18);
 		g2.setFont(font);
-		g2.setColor(new Color(45, 45, 45));
-		g2.fillRoundRect(x, y, 100, 100, 25, 25);
+		for (int i = 0; i < world.getBodyCount(); i++) {
+			SimulationBody body = (SimulationBody) world.getBody(i);
+			render(g2, body);
+		}
 		g2.setColor(new Color(0, 0, 0));
 		g2.fillRect(0, 0, getWidth(), 23);
 		g2.setColor(new Color(255, 255, 255));

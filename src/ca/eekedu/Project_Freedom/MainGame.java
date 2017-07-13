@@ -1,5 +1,9 @@
 package ca.eekedu.Project_Freedom;
 
+import org.dyn4j.dynamics.World;
+import org.dyn4j.geometry.*;
+import org.dyn4j.geometry.Rectangle;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -23,6 +27,8 @@ public class MainGame extends JFrame implements Runnable {
 	public static Color drawColor = Color.RED;
 	public static int drawingCount = 0;
 	static Timer update = new Timer(0, null);
+	static World world = new World();
+	static SimulationBody charBody = new SimulationBody(Color.RED);
 	static int RESOLUTION_WIDTH = 1080;
 	static int RESOLUTION_HEIGHT = 720;
 	static int SYSTEM_RES_WIDTH = 0;
@@ -96,6 +102,22 @@ public class MainGame extends JFrame implements Runnable {
 		setVisible(true);
 		positionWindowAndSize();
 
+		world.setGravity(new Vector2(0.0, 9.7));
+
+		charBody.addFixture(new Rectangle(100.0, 100.0));
+		Transform t = new Transform();
+		t.translate(100.0, 50.0);
+		charBody.setTransform(t);
+		charBody.setMass(new Mass(new Vector2(1.0, 1.0), 20.0, 100.0));
+
+		SimulationBody floor = new SimulationBody(Color.BLACK);
+		floor.addFixture(new Rectangle(2000.0, 40.0));
+		floor.setMass(MassType.INFINITE);
+		floor.translate(RESOLUTION_WIDTH - 950, RESOLUTION_HEIGHT - 20);
+
+		world.addBody(charBody);
+		world.addBody(floor);
+
 	}
 
 	public static void doDraw(int pos) throws Exception {
@@ -122,7 +144,7 @@ public class MainGame extends JFrame implements Runnable {
 		Dimension system_resolution = Toolkit.getDefaultToolkit().getScreenSize();
 		SYSTEM_RES_WIDTH = system_resolution.width;
 		SYSTEM_RES_HEIGHT = system_resolution.height;
-		Rectangle window = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		java.awt.Rectangle window = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 		SYSTEM_MAXDRAW_WIDTH = window.width;
 		SYSTEM_MAXDRAW_HEIGHT = window.height;
 		mainGame = new MainGame();
@@ -134,8 +156,10 @@ public class MainGame extends JFrame implements Runnable {
 					JOptionPane.showMessageDialog(mainGame, "Game window had a problem starting right away",
 							"Minor error", JOptionPane.PLAIN_MESSAGE);
 				}
-				if (graphics.inventory == null) {
+				//if (graphics.inventory == null) {
+				world.update(1.0);
 					graphics.update();
+
 					if (mode == GAMEMODE.Game) {
 						mainGame.requestFocus();
 					}
@@ -146,7 +170,7 @@ public class MainGame extends JFrame implements Runnable {
 						}
 					}
 					checkControls();
-				}
+				//}
 			}
 		};
 
@@ -162,16 +186,16 @@ public class MainGame extends JFrame implements Runnable {
 	public static void checkControls() {
 		for (Integer key: keysPressed.keySet()){
 			if (key.equals(keybinds.get("CHAR_UP")))
-				if (mode == GAMEMODE.Game) graphics.y--;
+				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(0.0, -5.0));
 				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY - 1); mousePos();
 			if (key.equals(keybinds.get("CHAR_DOWN")))
-				if (mode == GAMEMODE.Game) graphics.y++;
+				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(0.0, 5.0));
 				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY + 1); mousePos();
 			if (key.equals(keybinds.get("CHAR_LEFT")))
-				if (mode == GAMEMODE.Game) graphics.x--;
+				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(-5.0, 0.0));
 				else if (pressed) mouseRobot.mouseMove(mouseX - 1, mouseY); mousePos();
 			if (key.equals(keybinds.get("CHAR_RIGHT")))
-				if (mode == GAMEMODE.Game) graphics.x++;
+				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(5.0, 0.0));
 				else if (pressed) mouseRobot.mouseMove(mouseX + 1, mouseY); mousePos();
 		}
 	}
