@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.util.Iterator;
 
 import static ca.eekedu.Project_Freedom.DrawingFrame.mouseX;
@@ -23,7 +24,6 @@ public class GraphicsGame extends JPanel {
 
 	GraphicsGame(){
 		setForeground(new Color(0, 0, 0));
-		scale();
 	}
 
 	public void update(){
@@ -34,6 +34,7 @@ public class GraphicsGame extends JPanel {
 		inventoryPanel = new JPanel() {
 			protected void paintComponent(Graphics g) {
 				Graphics2D g2 = (Graphics2D) g;
+				g2.scale(scale, scale);
 				Font font = new Font("Serif", Font.PLAIN, 18);
 				g2.setFont(font);
 				g2.fillRect(0, 0, 419, 22);
@@ -100,7 +101,7 @@ public class GraphicsGame extends JPanel {
 	
 	public void scale(){
 		if (RESOLUTION_HEIGHT != 0) {
-			scale = RESOLUTION_WIDTH / RESOLUTION_HEIGHT;
+			scale = (RESOLUTION_WIDTH / RESOLUTION_HEIGHT);
 		} else {
 			scale = 1;
 		}
@@ -118,10 +119,15 @@ public class GraphicsGame extends JPanel {
         //g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         Font font = new Font("Serif", Font.PLAIN, 18);
 		g2.setFont(font);
+
+		AffineTransform t = g2.getTransform();
+		g2.translate(-charBody.getTransform().getTranslationX() + (RESOLUTION_WIDTH / 2), 0);
 		for (int i = 0; i < world.getBodyCount(); i++) {
 			SimulationBody body = (SimulationBody) world.getBody(i);
 			render(g2, body);
 		}
+		g2.setTransform(t);
+
 		g2.setColor(new Color(0, 0, 0));
 		g2.fillRect(0, 0, getWidth(), 23);
 		g2.setColor(new Color(255, 255, 255));

@@ -1,12 +1,13 @@
 package ca.eekedu.Project_Freedom;
 
-/*Version: Alpha 0.3.1
+/*Version: Alpha 0.3.1-2
 	Made by Brettink (brett_wad_12@hotmail.com)
 	Classes include: MainGame, GraphicsGame, DrawingFrame, GraphicsDrawing,
 						DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject)
 	Classes modified to fit project parameters: SimulationBody, Graphics2DRenderer
 */
 
+import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.dynamics.World;
 import org.dyn4j.geometry.*;
 import org.dyn4j.geometry.Rectangle;
@@ -42,7 +43,7 @@ public class MainGame extends JFrame implements Runnable {
 	static int SYSTEM_RES_HEIGHT = 0;
 	static int SYSTEM_MAXDRAW_WIDTH = 0;
 	static int SYSTEM_MAXDRAW_HEIGHT = 0;
-	SimulationBody floor = new SimulationBody(Color.BLACK);
+	static SimulationBody floor = new SimulationBody(Color.BLACK);
 
 	MainGame() throws AWTException {
 
@@ -109,14 +110,23 @@ public class MainGame extends JFrame implements Runnable {
 
 		world.setGravity(new Vector2(0.0, 9.7));
 
-		charBody.addFixture(new Circle(50.0));
+		BodyFixture charFixture = new BodyFixture(new Circle(50.0));
+		charFixture.setDensity(0.1);
+		charFixture.setFriction(1.0);
+		charFixture.setRestitution(0.0);
+
+		charBody.addFixture(charFixture);
 		Transform t = new Transform();
-		t.translate(100.0, 50.0);
+		t.translate(100.0, 150.0);
 		charBody.setTransform(t);
-		charBody.setMass(new Mass(new Vector2(0.0, 0.0), 20.0, 1.0));
+		charBody.setMass(new Mass(new Vector2(0.0, 0.0), 25.0, 1.0));
 		charBody.setAutoSleepingEnabled(true);
 		charBody.setAngularDamping(0.1);
 		charBody.setLinearDamping(0.1);
+
+		floor.addFixture(new Rectangle(RESOLUTION_WIDTH, 40.0));
+		floor.setMass(MassType.INFINITE);
+		floor.translate(RESOLUTION_WIDTH / 2, RESOLUTION_HEIGHT - 20);
 
 		world.addBody(charBody);
 		world.addBody(floor);
@@ -213,13 +223,11 @@ public class MainGame extends JFrame implements Runnable {
 		int posY = (SYSTEM_RES_HEIGHT / 2) - (RESOLUTION_HEIGHT / 2);
 		setLocation(posX, posY);
 		graphics.scale();
-		world.removeBody(floor);
-		floor = new SimulationBody(Color.BLACK);
-		floor.addFixture(new Rectangle(RESOLUTION_WIDTH, 40.0));
-		floor.setMass(MassType.INFINITE);
-		floor.translate(RESOLUTION_WIDTH / 2, RESOLUTION_HEIGHT - 20);
+		double floorX = floor.getTransform().copy().getTranslationX();
+		floor.setTransform(new Transform());
+		floor.translate(floorX, RESOLUTION_HEIGHT - 20);
 		charBody.translate(0.0, -100.0);
-		world.addBody(floor);
+
 	}
 
 	public void run() {
