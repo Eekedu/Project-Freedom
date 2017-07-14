@@ -1,5 +1,12 @@
 package ca.eekedu.Project_Freedom;
 
+/*Version: Alpha 0.3.1
+	Made by Brettink (brett_wad_12@hotmail.com)
+	Classes include: MainGame, GraphicsGame, DrawingFrame, GraphicsDrawing,
+						DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject)
+	Classes modified to fit project parameters: SimulationBody, Graphics2DRenderer
+*/
+
 import org.dyn4j.dynamics.World;
 import org.dyn4j.geometry.*;
 import org.dyn4j.geometry.Rectangle;
@@ -28,13 +35,14 @@ public class MainGame extends JFrame implements Runnable {
 	public static int drawingCount = 0;
 	static Timer update = new Timer(0, null);
 	static World world = new World();
-	static SimulationBody charBody = new SimulationBody(Color.RED);
+	static SimulationBody charBody = new SimulationBody(new Color(145, 145, 145));
 	static int RESOLUTION_WIDTH = 1080;
 	static int RESOLUTION_HEIGHT = 720;
 	static int SYSTEM_RES_WIDTH = 0;
 	static int SYSTEM_RES_HEIGHT = 0;
 	static int SYSTEM_MAXDRAW_WIDTH = 0;
 	static int SYSTEM_MAXDRAW_HEIGHT = 0;
+	SimulationBody floor = new SimulationBody(Color.BLACK);
 
 	MainGame() throws AWTException {
 
@@ -68,12 +76,10 @@ public class MainGame extends JFrame implements Runnable {
 						RESOLUTION_WIDTH = 1280;
 						RESOLUTION_HEIGHT = 800;
 						positionWindowAndSize();
-						graphics.scale();
 					} else if (e.getKeyCode() == keybinds.get("SIZE_DOWN")){
 						RESOLUTION_WIDTH = 1080;
 						RESOLUTION_HEIGHT = 720;
 						positionWindowAndSize();
-						graphics.scale();
 					}
 				}
 				if (e.getKeyCode() == keybinds.get("CHAR_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
@@ -100,24 +106,22 @@ public class MainGame extends JFrame implements Runnable {
 		});
 		add(graphics);
 		setVisible(true);
-		positionWindowAndSize();
 
 		world.setGravity(new Vector2(0.0, 9.7));
 
-		charBody.addFixture(new Rectangle(100.0, 100.0));
+		charBody.addFixture(new Circle(50.0));
 		Transform t = new Transform();
 		t.translate(100.0, 50.0);
 		charBody.setTransform(t);
-		charBody.setMass(new Mass(new Vector2(1.0, 1.0), 20.0, 100.0));
-
-		SimulationBody floor = new SimulationBody(Color.BLACK);
-		floor.addFixture(new Rectangle(2000.0, 40.0));
-		floor.setMass(MassType.INFINITE);
-		floor.translate(RESOLUTION_WIDTH - 950, RESOLUTION_HEIGHT - 20);
+		charBody.setMass(new Mass(new Vector2(0.0, 0.0), 20.0, 1.0));
+		charBody.setAutoSleepingEnabled(true);
+		charBody.setAngularDamping(0.1);
+		charBody.setLinearDamping(0.1);
 
 		world.addBody(charBody);
 		world.addBody(floor);
 
+		positionWindowAndSize();
 	}
 
 	public static void doDraw(int pos) throws Exception {
@@ -132,10 +136,10 @@ public class MainGame extends JFrame implements Runnable {
 		}
 		mode = GAMEMODE.Draw;
 		getBackColor();
-		MySwingWorker run = new MySwingWorker();
-		run.r = draw;
-		MySwingWorker run2 = new MySwingWorker();
-		run2.r = dHelper;
+
+		MySwingWorker run = new MySwingWorker(draw);
+		MySwingWorker run2 = new MySwingWorker(dHelper);
+
 		run.execute();
 		run2.execute();
 	}
@@ -156,47 +160,49 @@ public class MainGame extends JFrame implements Runnable {
 					JOptionPane.showMessageDialog(mainGame, "Game window had a problem starting right away",
 							"Minor error", JOptionPane.PLAIN_MESSAGE);
 				}
-				//if (graphics.inventory == null) {
-				world.update(1.0);
-					graphics.update();
 
-					if (mode == GAMEMODE.Game) {
-						mainGame.requestFocus();
+				world.update(1.0, 0.05);
+				graphics.update();
+
+				if (mode == GAMEMODE.Game) {
+					mainGame.requestFocus();
+				}
+				if (draw != null) {
+					if (!draw.isVisible()) {
+						dHelper = null;
+						draw = null;
 					}
-					if (draw != null) {
-						if (!draw.isVisible()) {
-							dHelper = null;
-							draw = null;
-						}
-					}
-					checkControls();
-				//}
+				}
+				checkControls();
 			}
 		};
 
 		update = new Timer(5, updateTimer); //Smooth update of graphics, reduced lag
 		update.start();
 
-		MySwingWorker main = new MySwingWorker();
-		main.r = mainGame;
+		MySwingWorker main = new MySwingWorker(mainGame);
 		main.execute();
 
 	}
 
 	public static void checkControls() {
-		for (Integer key: keysPressed.keySet()){
+		for (Integer key : keysPressed.keySet()) {
 			if (key.equals(keybinds.get("CHAR_UP")))
-				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(0.0, -5.0));
-				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY - 1); mousePos();
+				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(0.0, -20.0));
+				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY - 1);
+			mousePos();
 			if (key.equals(keybinds.get("CHAR_DOWN")))
-				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(0.0, 5.0));
-				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY + 1); mousePos();
+				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(0.0, 20.0));
+				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY + 1);
+			mousePos();
 			if (key.equals(keybinds.get("CHAR_LEFT")))
 				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(-5.0, 0.0));
-				else if (pressed) mouseRobot.mouseMove(mouseX - 1, mouseY); mousePos();
+				else if (pressed) mouseRobot.mouseMove(mouseX - 1, mouseY);
+			mousePos();
 			if (key.equals(keybinds.get("CHAR_RIGHT")))
 				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(5.0, 0.0));
-				else if (pressed) mouseRobot.mouseMove(mouseX + 1, mouseY); mousePos();
+				else if (pressed) mouseRobot.mouseMove(mouseX + 1, mouseY);
+			mousePos();
 		}
 	}
 
@@ -206,6 +212,14 @@ public class MainGame extends JFrame implements Runnable {
 		int posX = (SYSTEM_RES_WIDTH / 2) - (RESOLUTION_WIDTH / 2);
 		int posY = (SYSTEM_RES_HEIGHT / 2) - (RESOLUTION_HEIGHT / 2);
 		setLocation(posX, posY);
+		graphics.scale();
+		world.removeBody(floor);
+		floor = new SimulationBody(Color.BLACK);
+		floor.addFixture(new Rectangle(RESOLUTION_WIDTH, 40.0));
+		floor.setMass(MassType.INFINITE);
+		floor.translate(RESOLUTION_WIDTH / 2, RESOLUTION_HEIGHT - 20);
+		charBody.translate(0.0, -100.0);
+		world.addBody(floor);
 	}
 
 	public void run() {
@@ -235,6 +249,9 @@ public class MainGame extends JFrame implements Runnable {
 	public static class MySwingWorker extends SwingWorker<Thread, Runnable> {
 		Runnable r;
 
+		MySwingWorker(Runnable r) {
+			this.r = r;
+		}
 		protected Thread doInBackground() throws Exception {
 			return new Thread(r);
 		}

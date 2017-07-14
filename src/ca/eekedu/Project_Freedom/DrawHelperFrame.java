@@ -17,8 +17,8 @@ public class DrawHelperFrame extends JFrame implements Runnable {
         setTitle("I'm the helper window :3");
         setFocusable(false);
 		setUndecorated(true);
-        setOpacity(0.25F);
-        setSize(1, 1);
+		setOpacity(0.5F);
+		setSize(1, 1);
 		setLocation(1, 1);
 		setVisible(true);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);

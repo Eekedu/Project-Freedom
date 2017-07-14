@@ -152,12 +152,14 @@ public class DrawingFrame extends JFrame implements Runnable{
 							Point newPos = new Point(0, 0);
 							DrawObject obj = new DrawObject();
 							for (DrawObject object: drawObjects.values()){
-                                Point center = new Point(object.endPoints.x - ((object.endPoints.x - object.position.x) / 2),
-                                        object.endPoints.y - ((object.endPoints.y - object.position.y) / 2));
-								if (center.distance(mouseX, mouseY) < minDistance){
-									minDistance = (int) center.distance(mouseX, mouseY);
-									newPos = new Point(center.x, center.y);
-									obj = object;
+								if (!object.type.equals(DRAWMODE.FreeDraw)) {
+									Point center = new Point(object.endPoints.x - ((object.endPoints.x - object.position.x) / 2),
+											object.endPoints.y - ((object.endPoints.y - object.position.y) / 2));
+									if (center.distance(mouseX, mouseY) < minDistance) {
+										minDistance = (int) center.distance(mouseX, mouseY);
+										newPos = new Point(center.x, center.y);
+										obj = object;
+									}
 								}
 							}
 							int mouseMod = (keybinds.get("MOUSE_P") - 1) * 2;

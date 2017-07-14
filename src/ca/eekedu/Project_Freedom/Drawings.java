@@ -1,7 +1,6 @@
 package ca.eekedu.Project_Freedom;
 
 import ca.eekedu.Project_Freedom.Drawings.Drawing;
-import org.dyn4j.dynamics.Body;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,7 +11,7 @@ import static ca.eekedu.Project_Freedom.MainGame.DRAWMODE;
 
 public class Drawings extends TreeMap<Integer, Drawing> {
 
-    public static class Drawing extends Body {
+	public static class Drawing extends SimulationBody {
 
         String drawingName = "";
         int weight = 0;

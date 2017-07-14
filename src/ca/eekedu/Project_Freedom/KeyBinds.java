@@ -35,7 +35,7 @@ public class KeyBinds extends HashMap<String, Integer> {
 				+ "MOUSE_P:\t0x1\n"
 				+ "CENTER_B:\t32\n"
 				+ "SELECT_O:\t86\n"
-				+ "INVENT_B:\t73");
+				+ "INVENT_B:\t69");
 		fw.close();
 	}
 
