@@ -3,10 +3,13 @@ package ca.eekedu.Project_Freedom;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Convex;
+import org.dyn4j.geometry.Transform;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+
+import static ca.eekedu.Project_Freedom.MainGame.RESOLUTION_HEIGHT;
 
 /**
  * Custom Body class to add drawing functionality.
@@ -51,6 +54,16 @@ public class SimulationBody extends Body {
      */
     public void render(Graphics2D g, double scale) {
         this.render(g, scale, this.color);
+    }
+
+    public void setLocation(double x, double y) {
+        this.setLocation(x, y, 0.0);
+    }
+
+    public void setLocation(double x, double y, double rotation) {
+        this.setTransform(new Transform());
+        this.rotate(rotation);
+        this.translate(x * 10, RESOLUTION_HEIGHT - (y * 10));
     }
 
     /**

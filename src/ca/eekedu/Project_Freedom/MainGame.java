@@ -1,6 +1,6 @@
 package ca.eekedu.Project_Freedom;
 
-/*Version: Alpha 0.3.1-2
+/*Version: Alpha 0.3.2
 	Made by Brettink (brett_wad_12@hotmail.com)
 	Classes include: MainGame, GraphicsGame, DrawingFrame, GraphicsDrawing,
 						DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject)
@@ -108,7 +108,7 @@ public class MainGame extends JFrame implements Runnable {
 		add(graphics);
 		setVisible(true);
 
-		world.setGravity(new Vector2(0.0, 9.7));
+		world.setGravity(new Vector2(0.0, 9.807));
 
 		BodyFixture charFixture = new BodyFixture(new Circle(50.0));
 		charFixture.setDensity(0.1);
@@ -116,17 +116,13 @@ public class MainGame extends JFrame implements Runnable {
 		charFixture.setRestitution(0.0);
 
 		charBody.addFixture(charFixture);
-		Transform t = new Transform();
-		t.translate(100.0, 150.0);
-		charBody.setTransform(t);
 		charBody.setMass(new Mass(new Vector2(0.0, 0.0), 25.0, 1.0));
 		charBody.setAutoSleepingEnabled(true);
 		charBody.setAngularDamping(0.1);
 		charBody.setLinearDamping(0.1);
 
-		floor.addFixture(new Rectangle(RESOLUTION_WIDTH, 40.0));
+		floor.addFixture(new Rectangle(RESOLUTION_WIDTH, 50.0));
 		floor.setMass(MassType.INFINITE);
-		floor.translate(RESOLUTION_WIDTH / 2, RESOLUTION_HEIGHT - 20);
 
 		world.addBody(charBody);
 		world.addBody(floor);
@@ -223,10 +219,9 @@ public class MainGame extends JFrame implements Runnable {
 		int posY = (SYSTEM_RES_HEIGHT / 2) - (RESOLUTION_HEIGHT / 2);
 		setLocation(posX, posY);
 		graphics.scale();
-		double floorX = floor.getTransform().copy().getTranslationX();
-		floor.setTransform(new Transform());
-		floor.translate(floorX, RESOLUTION_HEIGHT - 20);
-		charBody.translate(0.0, -100.0);
+		floor.setLocation(0.0, 2.5);
+		double getRot = charBody.getTransform().getRotation();
+		charBody.setLocation(graphics.worldX / 10, 10, getRot);
 
 	}
 

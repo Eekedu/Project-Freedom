@@ -45,7 +45,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 		toFront();
         drawObjects = new HashMap<>();
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-		Image cursImg = toolkit.getImage("curs.png");
+	    Image cursImg = toolkit.getImage("images/cursor/curs.png");
 		Point hotSpot = new Point(0, 0);
 		customCurs = toolkit.createCustomCursor(cursImg, hotSpot, "Cursor");
 		setCursor(customCurs);

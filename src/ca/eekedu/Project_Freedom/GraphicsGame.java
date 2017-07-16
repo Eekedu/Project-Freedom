@@ -2,6 +2,7 @@ package ca.eekedu.Project_Freedom;
 
 import ca.eekedu.Project_Freedom.Drawings.Drawing;
 import ca.eekedu.Project_Freedom.MainGame.*;
+import org.dyn4j.geometry.Transform;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.text.DecimalFormat;
 import java.util.Iterator;
 
 import static ca.eekedu.Project_Freedom.DrawingFrame.mouseX;
@@ -21,6 +23,7 @@ public class GraphicsGame extends JPanel {
 	float scale;
 	JScrollPane inventory;
 	JPanel inventoryPanel = new JPanel();
+	double worldX = 0, worldY = 0;
 
 	GraphicsGame(){
 		setForeground(new Color(0, 0, 0));
@@ -121,12 +124,28 @@ public class GraphicsGame extends JPanel {
 		g2.setFont(font);
 
 		AffineTransform t = g2.getTransform();
-		g2.translate(-charBody.getTransform().getTranslationX() + (RESOLUTION_WIDTH / 2), 0);
+		double transY = 0;
+		Transform charBodyTrans = charBody.getTransform();
+		Transform floorTrans = floor.getTransform();
+		if (charBodyTrans.getTranslationY() < RESOLUTION_HEIGHT / 2) {
+			transY = -charBodyTrans.getTranslationY() + (RESOLUTION_HEIGHT / 2);
+		}
+		g2.translate(-charBodyTrans.getTranslationX() + (RESOLUTION_WIDTH / 2), transY);
 		for (int i = 0; i < world.getBodyCount(); i++) {
 			SimulationBody body = (SimulationBody) world.getBody(i);
-			render(g2, body);
+			if (transY > 0 && !body.equals(charBody)) {
+				AffineTransform t2 = g2.getTransform();
+				g2.translate(0, transY);
+				render(g2, body);
+				g2.setTransform(t2);
+			} else {
+				render(g2, body);
+			}
 		}
 		g2.setTransform(t);
+
+		worldX = charBodyTrans.getTranslationX() - floorTrans.getTranslationX();
+		worldY = (charBodyTrans.getTranslationY() - floorTrans.getTranslationY());
 
 		g2.setColor(new Color(0, 0, 0));
 		g2.fillRect(0, 0, getWidth(), 23);
@@ -141,16 +160,18 @@ public class GraphicsGame extends JPanel {
 						+ drawColor.getGreen() + ", " 
 						+ drawColor.getBlue() + "\t"
 						+ "Size: " + ((drawMode == DRAWMODE.Line)? 
-								(float)p.distance(dHelper.getWidth(), dHelper.getHeight()): 
-									dHelper.getWidth() + ", " + dHelper.getHeight())
+								(float)p.distance(dHelper.getWidth(), dHelper.getHeight()):
+								(drawMode != DRAWMODE.FreeDraw) ? dHelper.getWidth() + ", " + dHelper.getHeight() : "")
 					, -50, 18);
 			} catch (NullPointerException e) {
 				System.out.println(e.getMessage());
 			}
 		} else {
-			if (!drawingsList.isEmpty()){
-				drawtabString(g2, "\t# of Drawings: " + drawingsList.size(), -50, 18);
-			}
+			DecimalFormat df = new DecimalFormat("#.0");
+			String wX = df.format(worldX / 10);
+			String wY = df.format(-worldY / 10);
+			drawtabString(g2, "\t# of Drawings: " + drawingsList.size() + "\t" +
+					"Position(x,y): (" + wX + "," + wY + ")", -50, 18);
 		}
 
 	}
