@@ -133,19 +133,12 @@ public class GraphicsGame extends JPanel {
 		g2.translate(-charBodyTrans.getTranslationX() + (RESOLUTION_WIDTH / 2), transY);
 		for (int i = 0; i < world.getBodyCount(); i++) {
 			SimulationBody body = (SimulationBody) world.getBody(i);
-			if (transY > 0 && !body.equals(charBody)) {
-				AffineTransform t2 = g2.getTransform();
-				g2.translate(0, transY);
-				render(g2, body);
-				g2.setTransform(t2);
-			} else {
-				render(g2, body);
-			}
+			render(g2, body);
 		}
 		g2.setTransform(t);
 
 		worldX = charBodyTrans.getTranslationX() - floorTrans.getTranslationX();
-		worldY = (charBodyTrans.getTranslationY() - floorTrans.getTranslationY());
+		worldY = (charBodyTrans.getTranslationY() - floorTrans.getTranslationY()) - 25;
 
 		g2.setColor(new Color(0, 0, 0));
 		g2.fillRect(0, 0, getWidth(), 23);
@@ -169,7 +162,7 @@ public class GraphicsGame extends JPanel {
 		} else {
 			DecimalFormat df = new DecimalFormat("#.0");
 			String wX = df.format(worldX / 10);
-			String wY = df.format(-worldY / 10);
+			String wY = df.format(-(worldY + 50) / 10);
 			drawtabString(g2, "\t# of Drawings: " + drawingsList.size() + "\t" +
 					"Position(x,y): (" + wX + "," + wY + ")", -50, 18);
 		}

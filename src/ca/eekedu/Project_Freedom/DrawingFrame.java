@@ -220,7 +220,10 @@ public class DrawingFrame extends JFrame implements Runnable{
 							for (Map.Entry<Integer, DrawObject> object : drawObjects.entrySet().stream()
 									.filter(p -> p.getValue().type.equals(DRAWMODE.FreeDraw)).collect(Collectors.toList())) {
 
-								if (t.contains(new Vector2(object.getValue().position.getX(), object.getValue().position.getY()))) {
+								if (t.contains(new Vector2(object.getValue().position.getX(),
+										object.getValue().position.getY()))
+										&& t.contains((new Vector2(object.getValue().size.getX(),
+										object.getValue().size.getY())))) {
 									drawObjects.remove(object.getKey(), object.getValue());
 								}
 							}
