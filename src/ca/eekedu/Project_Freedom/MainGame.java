@@ -1,6 +1,6 @@
 package ca.eekedu.Project_Freedom;
 
-/*Version: Alpha 0.3.2
+/*Version: Alpha 0.3.3
 	Made by Brettink (brett_wad_12@hotmail.com)
 	Classes include: MainGame, GraphicsGame, DrawingFrame, GraphicsDrawing,
 						DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject)
@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
@@ -34,6 +35,8 @@ public class MainGame extends JFrame implements Runnable {
 	public static DrawHelperFrame dHelper = null;
 	public static Color drawColor = Color.RED;
 	public static int drawingCount = 0;
+	public static MySwingWorker run;
+	public static MySwingWorker run2;
 	static Timer update = new Timer(0, null);
 	static World world = new World();
 	static SimulationBody charBody = new SimulationBody(new Color(145, 145, 145));
@@ -143,11 +146,28 @@ public class MainGame extends JFrame implements Runnable {
 		mode = GAMEMODE.Draw;
 		getBackColor();
 
-		MySwingWorker run = new MySwingWorker(draw);
-		MySwingWorker run2 = new MySwingWorker(dHelper);
+		run = new MySwingWorker(draw);
+		run2 = new MySwingWorker(dHelper);
 
 		run.execute();
 		run2.execute();
+	}
+
+	public static void refresh(TreeMap<Integer, Drawings.Drawing.DrawObject> objects) {
+		int index = draw.curDrawingIndex;
+		draw = null;
+		try {
+			dHelper = new DrawHelperFrame();
+			draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT, objects);
+			draw.curDrawingIndex = index;
+			run = new MySwingWorker(draw);
+			run2 = new MySwingWorker(dHelper);
+
+			run.execute();
+			run2.execute();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void main(String[] args) throws AWTException {
@@ -170,13 +190,23 @@ public class MainGame extends JFrame implements Runnable {
 				world.update(1.0, 0.05);
 				graphics.update();
 
-				if (mode == GAMEMODE.Game) {
+				if (mode.equals(GAMEMODE.Game)) {
 					mainGame.requestFocus();
 				}
 				if (draw != null) {
 					if (!draw.isVisible()) {
 						dHelper = null;
 						draw = null;
+					} else if (draw.refreshMe) {
+						dHelper.dispose();
+						dHelper = null;
+						draw.dispose();
+						draw.refreshMe = false;
+						TreeMap<Integer, Drawings.Drawing.DrawObject> newObjects = new TreeMap<>();
+						for (Drawings.Drawing.DrawObject object : drawObjects.values()) {
+							newObjects.put(newObjects.size(), object);
+						}
+						refresh(newObjects);
 					}
 				}
 				checkControls();
@@ -194,19 +224,19 @@ public class MainGame extends JFrame implements Runnable {
 	public static void checkControls() {
 		for (Integer key : keysPressed.keySet()) {
 			if (key.equals(keybinds.get("CHAR_UP")))
-				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(0.0, -20.0));
+				if (mode.equals(GAMEMODE.Game)) charBody.applyImpulse(new Vector2(0.0, -20.0));
 				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY - 1);
 			mousePos();
 			if (key.equals(keybinds.get("CHAR_DOWN")))
-				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(0.0, 20.0));
+				if (mode.equals(GAMEMODE.Game)) charBody.applyImpulse(new Vector2(0.0, 20.0));
 				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY + 1);
 			mousePos();
 			if (key.equals(keybinds.get("CHAR_LEFT")))
-				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(-5.0, 0.0));
+				if (mode.equals(GAMEMODE.Game)) charBody.applyImpulse(new Vector2(-5.0, 0.0));
 				else if (pressed) mouseRobot.mouseMove(mouseX - 1, mouseY);
 			mousePos();
 			if (key.equals(keybinds.get("CHAR_RIGHT")))
-				if (mode == GAMEMODE.Game) charBody.applyImpulse(new Vector2(5.0, 0.0));
+				if (mode.equals(GAMEMODE.Game)) charBody.applyImpulse(new Vector2(5.0, 0.0));
 				else if (pressed) mouseRobot.mouseMove(mouseX + 1, mouseY);
 			mousePos();
 		}
@@ -256,6 +286,9 @@ public class MainGame extends JFrame implements Runnable {
 			this.r = r;
 		}
 		protected Thread doInBackground() throws Exception {
+			if (r == draw) {
+				draw.requestFocus();
+			}
 			return new Thread(r);
 		}
 	}

@@ -151,7 +151,7 @@ public class GraphicsGame extends JPanel {
 		g2.fillRect(0, 0, getWidth(), 23);
 		g2.setColor(new Color(255, 255, 255));
 		g2.drawString("Mode: " + mode.toString(), 1, 18);
-		if (mode == GAMEMODE.Draw){
+		if (mode.equals(GAMEMODE.Draw)) {
 			try {
 				Point p = new Point(0, 0);
 				drawtabString(g2, "\tDraw Mode: " + drawMode.toString() + "\t" + 
@@ -159,9 +159,9 @@ public class GraphicsGame extends JPanel {
 					"Color: " + drawColor.getRed() + ", " 
 						+ drawColor.getGreen() + ", " 
 						+ drawColor.getBlue() + "\t"
-						+ "Size: " + ((drawMode == DRAWMODE.Line)? 
+								+ "Size: " + ((drawMode.equals(DRAWMODE.Line)) ?
 								(float)p.distance(dHelper.getWidth(), dHelper.getHeight()):
-								(drawMode != DRAWMODE.FreeDraw) ? dHelper.getWidth() + ", " + dHelper.getHeight() : "")
+								(!drawMode.equals(DRAWMODE.FreeDraw)) ? dHelper.getWidth() + ", " + dHelper.getHeight() : "")
 					, -50, 18);
 			} catch (NullPointerException e) {
 				System.out.println(e.getMessage());

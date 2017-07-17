@@ -44,13 +44,13 @@ public class DrawHelperFrame extends JFrame implements Runnable {
 			g2.setColor(drawColor);
 			if (pressed){
 				int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
-				if (dir == DIRECTION.NE ||
-                        dir == DIRECTION.SW) {
-                    x1 = 0; y1 = getHeight();
+				if (dir.equals(DIRECTION.NE) ||
+						dir.equals(DIRECTION.SW)) {
+					x1 = 0; y1 = getHeight();
 					x2 = getWidth(); y2 = 0;
-				} else if (dir == DIRECTION.NW ||
-                        dir == DIRECTION.SE) {
-                    x1 = 0; y1 = 0;
+				} else if (dir.equals(DIRECTION.NW) ||
+						dir.equals(DIRECTION.SE)) {
+					x1 = 0; y1 = 0;
 					x2 = getWidth(); y2 = getHeight();
 				}
                 switch (drawMode) {

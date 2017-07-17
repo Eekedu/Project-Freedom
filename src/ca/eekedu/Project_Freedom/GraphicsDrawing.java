@@ -34,29 +34,35 @@ public class GraphicsDrawing extends JPanel {
 			switch (object.type) {
 				case Line:
 				case FreeDraw:
-					g2.drawLine(object.position.x, object.position.y, object.endPoints.x, object.endPoints.y);
+					g2.drawLine(object.position.x, object.position.y, object.size.x, object.size.y);
 					break;
-				case EmptyRect: Draw(g2, 'R', object.position, object.endPoints, false); break;
-				case FilledRect: Draw(g2, 'R', object.position, object.endPoints, true); break;
-				case Oval: Draw(g2, 'O', object.position, object.endPoints, false); break;
-				case FilledOval: Draw(g2, 'O', object.position, object.endPoints, true); break;
+				case EmptyRect:
+					Draw(g2, 'R', object.position, object.size, false);
+					break;
+				case FilledRect:
+					Draw(g2, 'R', object.position, object.size, true);
+					break;
+				case Oval:
+					Draw(g2, 'O', object.position, object.size, false);
+					break;
+				case FilledOval:
+					Draw(g2, 'O', object.position, object.size, true);
+					break;
 			}
 		}
 	}
 
-	public void Draw(Graphics2D g2, char type, Point start, Point end, boolean filled) {
-		int startX = start.x; int startY = start.y;
-		int mouseX = end.x; int mouseY = end.y;
-		int x = (mouseX < startX)? mouseX : startX;
-		int y = (mouseY < startY)? mouseY : startY;
-		int width = (mouseX > startX)? mouseX - startX: startX - mouseX;
-		int height = (mouseY > startY)? mouseY - startY: startY - mouseY;
+	public void Draw(Graphics2D g2, char type, Point start, Point size, boolean filled) {
 		switch (type){
 			case 'R': {
-				if (filled) g2.fillRect(x, y, width, height); else g2.drawRect(x, y, width, height); break;
+				if (filled) g2.fillRect(start.x, start.y, size.x, size.y);
+				else g2.drawRect(start.x, start.y, size.x, size.y);
+				break;
 			}
-			case 'O':{ 
-				if (filled) g2.fillOval(x, y, width, height); else g2.drawOval(x, y, width, height); break;
+			case 'O':{
+				if (filled) g2.fillOval(start.x, start.y, size.x, size.y);
+				else g2.drawOval(start.x, start.y, size.x, size.y);
+				break;
 			}
 		}
 	}
