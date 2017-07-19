@@ -84,7 +84,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 					int mouseMod = (keybinds.get("MOUSE_P") - 1) * 2;
 					if (mouseMod == 0) mouseMod = 1;
 					mouseRobot.mouseRelease(16 / mouseMod);
-				} else if (e.getKeyCode() == keybinds.get("CHAR_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
+				} else if (e.getKeyCode() == keybinds.get("MOUSE_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
 						e.getKeyCode() == keybinds.get("CHAR_LEFT") || e.getKeyCode() == keybinds.get("CHAR_RIGHT")) {
 					if (keysPressed.containsKey(e.getKeyCode())){
 						keysPressed.remove(e.getKeyCode(), 0);
@@ -137,7 +137,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 				} else if (e.getKeyCode() == keybinds.get("COLOR_D")) {
 					drawColor = drawColor.darker();
 					getBackColor();
-				} else if (e.getKeyCode() == keybinds.get("CHAR_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
+				} else if (e.getKeyCode() == keybinds.get("MOUSE_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
 						e.getKeyCode() == keybinds.get("CHAR_LEFT") || e.getKeyCode() == keybinds.get("CHAR_RIGHT")) {
 					keysPressed.put(e.getKeyCode(), 0);
 				} else if (e.getKeyCode() == keybinds.get("CENTER_B") && pressed && !center) {
@@ -265,7 +265,7 @@ public class DrawingFrame extends JFrame implements Runnable{
 				mousePos();
 				if (drawMode.equals(DRAWMODE.FreeDraw)) {
 					DrawObject object = new DrawObject(drawMode, new Point(startX, startY), new Point(mouseX, mouseY), drawColor);
-					drawObjects.put(drawObjects.size(), object);
+					drawObjects.put((!drawObjects.isEmpty()) ? drawObjects.lastEntry().getKey() + 1 : 0, object);
 					drawer.update();
 					startX = mouseX;
 					startY = mouseY;

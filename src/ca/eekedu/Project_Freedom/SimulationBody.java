@@ -2,14 +2,19 @@ package ca.eekedu.Project_Freedom;
 
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
+import org.dyn4j.dynamics.World;
 import org.dyn4j.geometry.Convex;
+import org.dyn4j.geometry.MassType;
 import org.dyn4j.geometry.Transform;
+import org.dyn4j.geometry.Vector2;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.util.stream.Collectors;
 
 import static ca.eekedu.Project_Freedom.MainGame.RESOLUTION_HEIGHT;
+import static ca.eekedu.Project_Freedom.MainGame.charBody;
 
 /**
  * Custom Body class to add drawing functionality.
@@ -66,6 +71,13 @@ public class SimulationBody extends Body {
         this.translate(x * 10, RESOLUTION_HEIGHT - (y * 10));
     }
 
+    public boolean isInConnectionAnything(World world) {
+        for (Body bodyToTest : world.getBodies().stream().filter(p -> !p.equals(this)).collect(Collectors.toList())) {
+            if (this.isInContact(bodyToTest)) return true;
+        }
+        return false;
+    }
+
     /**
      * Draws the body.
      * <p>
@@ -76,6 +88,15 @@ public class SimulationBody extends Body {
      * @param color the color to render the body
      */
     public void render(Graphics2D g, double scale, Color color) {
+
+        if (!(this.equals(charBody) || this.getMass().getType() == MassType.INFINITE)) {
+            Transform f = this.getTransform();
+            Transform c = charBody.getTransform();
+            Vector2 diff = f.getTranslation().difference(c.getTranslation());
+            if (!(diff.x < 2000 && diff.x > -2000)) {
+                return;
+            }
+        }
         // point radius
         final int pr = 4;
 

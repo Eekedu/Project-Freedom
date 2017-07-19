@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class KeyBinds extends HashMap<String, Integer> {
 
 	KeyBinds() {
-		File keybinds = new File("keybinds.cfg");
+		File keybinds = new File("config/keybinds.cfg");
 		if (!keybinds.exists()){
 			try {
 				populate_defaults(keybinds);
@@ -21,13 +21,14 @@ public class KeyBinds extends HashMap<String, Integer> {
 	public void populate_defaults(File keybinds) throws Exception{
 		FileWriter fw;
 		fw = new FileWriter(keybinds);
-		fw.write("CHAR_UP:\t87\n"
+		fw.write("MOUSE_UP:\t87\n"
 				+ "CHAR_DOWN:\t83\n"
 				+ "CHAR_LEFT:\t65\n"
 				+ "CHAR_RIGHT:\t68\n"
+				+ "CHAR_JUMP:\t32\n"
 				+ "SIZE_UP:\t38\n"
 				+ "SIZE_DOWN:\t40\n"
-				+ "DO_DRAW:\t32\n"
+				+ "DO_DRAW:\t81\n"
 				+ "CLICK_M:\t16\n"
 				+ "COLOR_C:\t67\n"
 				+ "COLOR_B:\t107\n"
@@ -47,7 +48,11 @@ public class KeyBinds extends HashMap<String, Integer> {
 			while((line = br.readLine()) != null){
 				String[] key = line.split(":\t");
 				switch (key[0]){
-					case "CHAR_UP": case "CHAR_DOWN": case "CHAR_LEFT": case "CHAR_RIGHT": 
+					case "MOUSE_UP":
+					case "CHAR_DOWN":
+					case "CHAR_LEFT":
+					case "CHAR_RIGHT":
+					case "CHAR_JUMP":
 					case "SIZE_UP": case "SIZE_DOWN": case "DO_DRAW": case "CLICK_M": 
 					case "COLOR_C": case "COLOR_B": case "COLOR_D": case "MOUSE_P": 
 					case "CENTER_B": case "SELECT_O": case "INVENT_B": {
@@ -64,7 +69,7 @@ public class KeyBinds extends HashMap<String, Integer> {
 			}
 			br.close();
 			fr.close();
-			if (count < 15){
+			if (count < 16) {
 				clear();
 				keybinds.delete();
 				populate_defaults(keybinds);

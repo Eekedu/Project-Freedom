@@ -1,6 +1,6 @@
 package ca.eekedu.Project_Freedom;
 
-/*Version: Alpha 0.3.4
+/*Version: Alpha 0.3.5
 	Made by Brettink (brett_wad_12@hotmail.com)
 	Classes include: MainGame, GraphicsGame, DrawingFrame, GraphicsDrawing,
 						DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject)
@@ -66,7 +66,7 @@ public class MainGame extends JFrame implements Runnable {
 					if (keysPressed.containsKey(e.getKeyCode())){
 						keysPressed.remove(e.getKeyCode(), 0);
 					}
-				} else if (e.getKeyCode() == keybinds.get("CHAR_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
+				} else if (e.getKeyCode() == keybinds.get("CHAR_JUMP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
 						e.getKeyCode() == keybinds.get("CHAR_LEFT") || e.getKeyCode() == keybinds.get("CHAR_RIGHT")){
 					if (keysPressed.containsKey(e.getKeyCode())){
 						keysPressed.remove(e.getKeyCode(), 0);
@@ -99,7 +99,7 @@ public class MainGame extends JFrame implements Runnable {
 						}
 					}
 				}
-				if (e.getKeyCode() == keybinds.get("CHAR_UP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
+				if (e.getKeyCode() == keybinds.get("CHAR_JUMP") || e.getKeyCode() == keybinds.get("CHAR_DOWN") ||
 						e.getKeyCode() == keybinds.get("CHAR_LEFT") || e.getKeyCode() == keybinds.get("CHAR_RIGHT")){
 					keysPressed.put(e.getKeyCode(), 0);
 				} else if (e.getKeyCode() == keybinds.get("DO_DRAW") && graphics.inventory == null) {
@@ -159,10 +159,12 @@ public class MainGame extends JFrame implements Runnable {
 
 		SimulationBody rando = new SimulationBody(Color.BLUE);
 		rando.setLocation(20.0, 20.0);
-		BodyFixture f = new BodyFixture(new Rectangle(200.0, 40.0));
+		BodyFixture f = new BodyFixture(new Rectangle(200.0, 50.0));
 		f.setDensity(1.0);
+		f.setFriction(1.0);
 		rando.addFixture(f);
-		rando.setMass(new Mass(new Vector2(0.0, 0.0), 5.0, 5000.0));
+		rando.setMass(new Mass(new Vector2(0.0, 0.0), 50.0, 0.0));
+		rando.setAutoSleepingEnabled(true);
 		rando.setAngularDamping(1.0);
 		rando.setLinearDamping(0.0);
 		rando.setAutoSleepingEnabled(true);
@@ -230,13 +232,13 @@ public class MainGame extends JFrame implements Runnable {
 					JOptionPane.showMessageDialog(mainGame, "Game window had a problem starting right away",
 							"Minor error", JOptionPane.PLAIN_MESSAGE);
 				}
-
 				world.update(1.0, 0.05);
 				graphics.update();
 
 				if (mode.equals(GAMEMODE.Game)) {
 					mainGame.requestFocus();
 				}
+
 				if (draw != null) {
 					if (!draw.isVisible()) {
 						dHelper = null;
@@ -267,20 +269,25 @@ public class MainGame extends JFrame implements Runnable {
 
 	public static void checkControls() {
 		for (Integer key : keysPressed.keySet()) {
-			if (key.equals(keybinds.get("CHAR_UP")))
-				if (mode.equals(GAMEMODE.Game)) charBody.applyImpulse(new Vector2(0.0, -20.0));
-				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY - 1);
+			if (key.equals(keybinds.get("CHAR_JUMP"))) {
+				if (mode.equals(GAMEMODE.Game)) {
+					if (charBody.isInConnectionAnything(world)) {
+						charBody.applyForce(new Vector2(0.0, -75000.0));
+					}
+				}
+			}
+			if (key.equals(keybinds.get("MOUSE_UP")) && pressed) mouseRobot.mouseMove(mouseX, mouseY - 1);
 			mousePos();
 			if (key.equals(keybinds.get("CHAR_DOWN")))
 				if (mode.equals(GAMEMODE.Game)) charBody.applyImpulse(new Vector2(0.0, 20.0));
 				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY + 1);
 			mousePos();
 			if (key.equals(keybinds.get("CHAR_LEFT")))
-				if (mode.equals(GAMEMODE.Game)) charBody.applyImpulse(new Vector2(-5.0, 0.0));
+				if (mode.equals(GAMEMODE.Game)) charBody.applyForce(new Vector2(-500.0, 0));
 				else if (pressed) mouseRobot.mouseMove(mouseX - 1, mouseY);
 			mousePos();
 			if (key.equals(keybinds.get("CHAR_RIGHT")))
-				if (mode.equals(GAMEMODE.Game)) charBody.applyImpulse(new Vector2(5.0, 0.0));
+				if (mode.equals(GAMEMODE.Game)) charBody.applyForce(new Vector2(500.0, 0));
 				else if (pressed) mouseRobot.mouseMove(mouseX + 1, mouseY);
 			mousePos();
 		}
@@ -311,6 +318,18 @@ public class MainGame extends JFrame implements Runnable {
 		int posX = (SYSTEM_RES_WIDTH / 2) - (RESOLUTION_WIDTH / 2);
 		int posY = (SYSTEM_RES_HEIGHT / 2) - (RESOLUTION_HEIGHT / 2);
 		setLocation(posX, posY);
+		/*Polygon po = new Polygon();
+		po.addPoint(0,0);
+		po.addPoint(RESOLUTION_WIDTH, 0);
+		po.addPoint(RESOLUTION_WIDTH, RESOLUTION_HEIGHT);
+		boolean flip = false;
+		for (int i = (RESOLUTION_WIDTH - (RESOLUTION_WIDTH / 40)); i > 0; i -= RESOLUTION_WIDTH / 40){
+			po.addPoint(i, (flip)? RESOLUTION_HEIGHT: RESOLUTION_HEIGHT - 15);
+			flip = !flip;
+		}
+		po.addPoint(0,RESOLUTION_HEIGHT);
+		po.addPoint(0,0);
+		setShape(po);*/
 		graphics.scale();
 		floor.setLocation(0.0, 2.5);
 		for (Body body : world.getBodies().stream().filter(p -> !p.equals(floor)).collect(Collectors.toSet())) {
