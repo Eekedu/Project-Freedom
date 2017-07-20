@@ -93,19 +93,19 @@ public final class Graphics2DRenderer {
                 radius2 * scale);
 
         // fill the shape
-        g.setColor(color);
-        g.fill(c);
+	    if (!(g.getPaint() instanceof TexturePaint)) g.setColor(color);
+	    g.fill(c);
         // draw the outline
         g.setColor(getOutlineColor(color));
         g.draw(c);
 
         // draw a line so that rotation is visible
-        Line2D.Double l = new Line2D.Double(
+        /*Line2D.Double l = new Line2D.Double(
                 center.x * scale,
                 center.y * scale,
                 (center.x + radius) * scale,
                 center.y * scale);
-        g.draw(l);
+        g.draw(l);*/
     }
 
     /**
@@ -129,8 +129,8 @@ public final class Graphics2DRenderer {
         p.closePath();
 
         // fill the shape
-        g.setColor(color);
-        g.fill(p);
+	    if (!(g.getPaint() instanceof TexturePaint)) g.setColor(color);
+	    g.fill(p);
         // draw the outline
         g.setColor(getOutlineColor(color));
         g.draw(p);
@@ -206,8 +206,8 @@ public final class Graphics2DRenderer {
         path.append(new Line2D.Double(arcR.getEndPoint(), arcL.getStartPoint()), true);
 
         // set the color
-        g.setColor(color);
-        // fill the shape
+	    if (!(g.getPaint() instanceof TexturePaint)) g.setColor(color);
+	    // fill the shape
         g.fill(path);
         // set the color
         g.setColor(getOutlineColor(color));
@@ -245,8 +245,8 @@ public final class Graphics2DRenderer {
                 height * scale);
 
         // fill the shape
-        g.setColor(color);
-        g.fill(c);
+	    if (!(g.getPaint() instanceof TexturePaint)) g.setColor(color);
+	    g.fill(c);
         // draw the outline
         g.setColor(getOutlineColor(color));
         g.draw(c);
@@ -288,8 +288,8 @@ public final class Graphics2DRenderer {
                 Arc2D.PIE);
 
         // fill the shape
-        g.setColor(color);
-        g.fill(a);
+	    if (!(g.getPaint() instanceof TexturePaint)) g.setColor(color);
+	    g.fill(a);
         // draw the outline
         g.setColor(getOutlineColor(color));
         g.draw(a);
@@ -332,8 +332,8 @@ public final class Graphics2DRenderer {
                 Arc2D.PIE);
 
         // fill the shape
-        g.setColor(color);
-        g.fill(a);
+	    if (!(g.getPaint() instanceof TexturePaint)) g.setColor(color);
+	    g.fill(a);
         // draw the outline
         g.setColor(getOutlineColor(color));
         g.draw(a);

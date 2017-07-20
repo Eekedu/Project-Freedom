@@ -1,10 +1,11 @@
 package ca.eekedu.Project_Freedom;
 
-/*Version: Alpha 0.3.5-2
-	Made by Brettink (brett_wad_12@hotmail.com)
-	Classes include: MainGame, GraphicsGame, DrawingFrame, GraphicsDrawing,
-						DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject)
-	Classes modified to fit project parameters: SimulationBody, Graphics2DRenderer
+/**
+ * Version: Alpha 0.3.6
+ * Made by Brettink (brett_wad_12@hotmail.com)
+ *      Classes include: MainGame, GraphicsGame, DrawingFrame, GraphicsDrawing,
+ DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject)
+ Classes modified to fit project parameters: SimulationBody, Graphics2DRenderer
 */
 
 import org.dyn4j.collision.AxisAlignedBounds;
@@ -19,10 +20,13 @@ import org.dyn4j.geometry.*;
 import org.dyn4j.geometry.Rectangle;
 
 import javax.swing.*;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -30,6 +34,10 @@ import java.util.stream.Collectors;
 import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
 public class MainGame extends JFrame implements Runnable {
+
+	/**
+	 * All the variables needed to run the program
+	 */
 
 	public static HashMap<Integer, Integer> keysPressed = new HashMap<>();
 	public static MainGame mainGame = null;
@@ -42,8 +50,6 @@ public class MainGame extends JFrame implements Runnable {
 	public static DrawHelperFrame dHelper = null;
 	public static Color drawColor = Color.RED;
 	public static int drawingCount = 0;
-	public static MySwingWorker run;
-	public static MySwingWorker run2;
 	static Timer update = new Timer(0, null);
 	static World world = new World();
 	static SimulationBody charBody = new SimulationBody(new Color(145, 145, 145));
@@ -56,9 +62,13 @@ public class MainGame extends JFrame implements Runnable {
 	static SimulationBody floor = new SimulationBody(Color.BLACK);
 	static TreeMap<Long, SimulationBody> floorNoEnd = new TreeMap<>();
 	static AxisAlignedBounds bounds;
+	static int P_RESOLUTION_HEIGHT = 720;
 	int P_RESOLUTION_WIDTH = 1080;
-	int P_RESOLUTION_HEIGHT = 720;
 
+	/**
+	 *  Default and only Constructor
+	 * @throws AWTException
+	 */
 	MainGame() throws AWTException {
 
 		setTitle("Project Freedom");
@@ -67,6 +77,7 @@ public class MainGame extends JFrame implements Runnable {
 		addKeyListener(new KeyListener() {
 
 			public void keyTyped(KeyEvent e) {}
+
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_SHIFT){
 					if (keysPressed.containsKey(e.getKeyCode())){
@@ -79,6 +90,7 @@ public class MainGame extends JFrame implements Runnable {
 					}
 				}
 			}
+
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_SHIFT){
 					keysPressed.put(e.getKeyCode(), 0);
@@ -126,17 +138,32 @@ public class MainGame extends JFrame implements Runnable {
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_F5) {
 					try {
-						String x2 = JOptionPane.showInputDialog("Enter x,y co-ord");
-						String[] split = x2.split(",|:");
-						double x = Double.parseDouble(split[0].trim());
-						double y = Double.parseDouble(split[1].trim());
-						double xBef = charBody.getTransform().getTranslationX();
-						charBody.setLocation(x, y);
-						double xDiff = charBody.getTransform().getTranslationX() - xBef;
-						if (xDiff > 2000.00 || xDiff < -2000.00) {
-							populate_Floor();
+						JPanel input = new JPanel();
+						JTextField xF = new JTextField(5);
+						JTextField yF = new JTextField(5);
+						input.add(new JLabel("<html>Max-X = 5000<br/>Max-Y = 512</html>"));
+						input.add(Box.createHorizontalStrut(30));
+						input.add(new JLabel("x:"));
+						input.add(xF);
+						input.add(Box.createHorizontalStrut(10));
+						input.add(new JLabel("y:"));
+						input.add(yF);
+						xF.addAncestorListener(new RequestFocusListener());
+						int msg = JOptionPane.showConfirmDialog(null, input, "Enter Coords",
+								JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+						if (msg != JOptionPane.CANCEL_OPTION) {
+							double x = Double.parseDouble(xF.getText().trim());
+							double y = Double.parseDouble(yF.getText().trim());
+							if (x <= 5000 | y <= 512) {
+								double xBef = charBody.getTransform().getTranslationX();
+								charBody.setLocation(x, y);
+								double xDiff = charBody.getTransform().getTranslationX() - xBef;
+								if (xDiff > 2000.00 || xDiff < -2000.00) {
+									populate_Floor();
+								}
+								charBody.setAsleep(false);
+							}
 						}
-						charBody.setAsleep(false);
 					} catch (Exception e2) {
 					}
 				}
@@ -160,19 +187,21 @@ public class MainGame extends JFrame implements Runnable {
 		charFixture.setFriction(1.0);
 		charFixture.setRestitution(0.0);
 
-		charBody.addFixture(charFixture);
+		charBody.addFixture(charFixture, new Point(100,100));
 		charBody.setMass(new Mass(new Vector2(0.0, 0.0), 25.0, 1.0));
 		charBody.setAutoSleepingEnabled(true);
 		charBody.setAngularDamping(0.1);
 		charBody.setLinearDamping(0.05);
-		charBody.setLocation(0.0, 10.0);
+		charBody.setLocation(0.0, 0.0);
+		charBody.setTexture(graphics.wheel, new Rectangle2D.Double(-(charBody.width / 2), -(charBody.height / 2)
+				, charBody.width, charBody.height));
 
 		floor.addFixture(new Rectangle(RESOLUTION_WIDTH, 50.0));
 		floor.setMass(MassType.INFINITE);
 
 		populate_Floor();
 
-		SimulationBody rando = new SimulationBody(Color.BLUE);
+		SimulationBody rando = new SimulationBody(Color.BLUE.darker());
 		rando.setLocation(20.0, 20.0);
 		BodyFixture f = new BodyFixture(new Rectangle(200.0, 50.0));
 		f.setDensity(1.0);
@@ -203,6 +232,11 @@ public class MainGame extends JFrame implements Runnable {
 		positionWindowAndSize();
 	}
 
+	/**
+	 *  Open the Drawing Window
+	 * @param pos position of drawing in the DrawingsList
+	 * @throws Exception
+	 */
 	public static void doDraw(int pos) throws Exception {
 		dHelper = new DrawHelperFrame();
 		if (pos == -1) {
@@ -216,13 +250,12 @@ public class MainGame extends JFrame implements Runnable {
 		mode = GAMEMODE.Draw;
 		getBackColor();
 
-		run = new MySwingWorker(draw);
-		run2 = new MySwingWorker(dHelper);
-
-		run.execute();
-		run2.execute();
 	}
 
+	/**
+	 * Not fully working yet
+	 * @param objects
+	 */
 	public static void refresh(TreeMap<Integer, Drawings.Drawing.DrawObject> objects) {
 		int index = draw.curDrawingIndex;
 		draw = null;
@@ -230,16 +263,16 @@ public class MainGame extends JFrame implements Runnable {
 			dHelper = new DrawHelperFrame();
 			draw = new DrawingFrame(SYSTEM_MAXDRAW_WIDTH, SYSTEM_MAXDRAW_HEIGHT, objects);
 			draw.curDrawingIndex = index;
-			run = new MySwingWorker(draw);
-			run2 = new MySwingWorker(dHelper);
-
-			run.execute();
-			run2.execute();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 *  Main method at startup
+	 * @param args
+	 * @throws AWTException
+	 */
 	public static void main(String[] args) throws AWTException {
 		Dimension system_resolution = Toolkit.getDefaultToolkit().getScreenSize();
 		SYSTEM_RES_WIDTH = system_resolution.width;
@@ -288,11 +321,11 @@ public class MainGame extends JFrame implements Runnable {
 		update = new Timer(5, updateTimer); //Smooth update of graphics, reduced lag
 		update.start();
 
-		MySwingWorker main = new MySwingWorker(mainGame);
-		main.execute();
-
 	}
 
+	/**
+	 * Check for controls needed only when pressed
+	 */
 	public static void checkControls() {
 		for (Integer key : keysPressed.keySet()) {
 			if (key.equals(keybinds.get("CHAR_JUMP"))) {
@@ -323,7 +356,7 @@ public class MainGame extends JFrame implements Runnable {
 			SimulationBody floor_P100 = new SimulationBody(Color.BLACK);
 			floor_P100.addFixture(new Rectangle(1080, 50));
 			floor_P100.setMass(MassType.INFINITE);
-			floor_P100.setLocation((((double) floorNoEnd.lastKey() * 10) + 1080) / 10, 2.5);
+			floor_P100.setLocation((((double) floorNoEnd.lastKey() * 10) + 1080) / 10, -7.5);
 			world.addBody(floor_P100);
 			floorNoEnd.put((floorNoEnd.lastKey() + 108), floor_P100);
 		} else if ((long) (graphics.worldX - 1620) < ((floorNoEnd.firstKey() * 10) - 1080)) {
@@ -332,12 +365,15 @@ public class MainGame extends JFrame implements Runnable {
 			SimulationBody floor_M100 = new SimulationBody(Color.BLACK);
 			floor_M100.addFixture(new Rectangle(1080, 50));
 			floor_M100.setMass(MassType.INFINITE);
-			floor_M100.setLocation((((double) floorNoEnd.firstKey() * 10) - 1080) / 10, 2.5);
+			floor_M100.setLocation((((double) floorNoEnd.firstKey() * 10) - 1080) / 10, -7.5);
 			world.addBody(floor_M100);
 			floorNoEnd.put((floorNoEnd.firstKey() - 108), floor_M100);
 		}
 	}
 
+	/**
+	 * Populated the ground for the main character to land on
+	 */
 	public void populate_Floor() {
 		if (!floorNoEnd.isEmpty()) {
 			for (SimulationBody body : floorNoEnd.values()) {
@@ -354,14 +390,17 @@ public class MainGame extends JFrame implements Runnable {
 		floor_M100.setMass(MassType.INFINITE);
 		floor_100.setMass(MassType.INFINITE);
 		floor_P100.setMass(MassType.INFINITE);
-		floor_M100.setLocation((((int) (graphics.worldX / 1080)) * 108) - 108, 2.5);
-		floor_100.setLocation((((int) (graphics.worldX / 1080)) * 108), 2.5);
-		floor_P100.setLocation((((int) (graphics.worldX / 1080)) * 108) + 108, 2.5);
+		floor_M100.setLocation((((int) (graphics.worldX / 1080)) * 108) - 108, -7.5);
+		floor_100.setLocation((((int) (graphics.worldX / 1080)) * 108), -7.5);
+		floor_P100.setLocation((((int) (graphics.worldX / 1080)) * 108) + 108, -7.5);
 		floorNoEnd.put((long) (((int) (graphics.worldX / 1080)) * 108) - 108, floor_M100);
 		floorNoEnd.put((long) (((int) (graphics.worldX / 1080)) * 108), floor_100);
 		floorNoEnd.put((long) (((int) (graphics.worldX / 1080)) * 108) + 108, floor_P100);
 	}
 
+	/**
+	 * Position window relative to size and system resolution
+	 */
 	public void positionWindowAndSize() {
 		setSize(RESOLUTION_WIDTH, RESOLUTION_HEIGHT);
 
@@ -381,14 +420,14 @@ public class MainGame extends JFrame implements Runnable {
 		po.addPoint(0,0);
 		setShape(po);*/
 		graphics.scale();
-		floor.setLocation(0.0, 2.5);
+		floor.setLocation(0.0, -7.5);
 		for (Body body : world.getBodies().stream().filter(p -> !p.equals(floor)).collect(Collectors.toSet())) {
 			SimulationBody simBody = (SimulationBody) body;
 			double getRot = simBody.getTransform().getRotation();
 			double getPosX = simBody.getTransform().getTranslationX();
 			double getPosY = simBody.getTransform().getTranslationY();
 
-			simBody.setLocation(getPosX / 10, (P_RESOLUTION_HEIGHT - getPosY) / 10, getRot);
+			simBody.setLocation(getPosX / 10, ((P_RESOLUTION_HEIGHT - 100) - getPosY) / 10, getRot);
 			simBody.setAsleep(false);
 		}
 
@@ -396,6 +435,7 @@ public class MainGame extends JFrame implements Runnable {
 
 	public void run() {
 	}
+
 
 	public enum GAMEMODE {Menu, Game, Draw}
 
@@ -418,17 +458,32 @@ public class MainGame extends JFrame implements Runnable {
 		}
 	}
 
-	public static class MySwingWorker extends SwingWorker<Thread, Runnable> {
-		Runnable r;
+	public class RequestFocusListener implements AncestorListener {
+		private boolean removeListener;
 
-		MySwingWorker(Runnable r) {
-			this.r = r;
+		public RequestFocusListener() {
+			this(true);
 		}
-		protected Thread doInBackground() throws Exception {
-			if (r == draw) {
-				draw.requestFocus();
-			}
-			return new Thread(r);
+
+		public RequestFocusListener(boolean removeListener) {
+			this.removeListener = removeListener;
+		}
+
+		@Override
+		public void ancestorAdded(AncestorEvent e) {
+			JComponent component = e.getComponent();
+			component.requestFocusInWindow();
+
+			if (removeListener)
+				component.removeAncestorListener(this );
+		}
+
+		@Override
+		public void ancestorMoved(AncestorEvent e) {
+		}
+
+		@Override
+		public void ancestorRemoved(AncestorEvent e) {
 		}
 	}
 
