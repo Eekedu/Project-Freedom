@@ -1,7 +1,7 @@
 package ca.eekedu.Project_Freedom;
 
 /**
- * Version: Alpha 0.3.6
+ * Version: Alpha 0.3.6-1
  * Made by Brettink (brett_wad_12@hotmail.com)
  *      Classes include: MainGame, GraphicsGame, DrawingFrame, GraphicsDrawing,
  DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject)

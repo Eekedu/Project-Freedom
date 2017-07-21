@@ -173,8 +173,9 @@ public class GraphicsGame extends JPanel {
 		}
 		g2.translate(-charBodyTrans.getTranslationX() + (RESOLUTION_WIDTH / 2), transY);
 		if (ground != null) {
-			drawBackground(g2, backdrop, 10, 0.75);
-			drawBackground(g2, ground, -72, 0.0);
+			drawBackground(g2, backdrop, 40.0, 0.50);
+			drawBackground(g2, backdrop, 10.0, 0.75);
+			drawBackground(g2, ground, -72.0, 0.0);
 		}
 		for (int i = 0; i < world.getBodyCount(); i++) {
 			SimulationBody body = (SimulationBody) world.getBody(i);
@@ -220,17 +221,20 @@ public class GraphicsGame extends JPanel {
 	 * @param pos      Position from the bottom
 	 * @param speedDec The deceleration from the characters point of view 0.0 to 1.0
 	 */
-	public void drawBackground(Graphics2D g2, BufferedImage image, int pos, double speedDec) {
+	public void drawBackground(Graphics2D g2, BufferedImage image, double pos, double speedDec) {
 		AffineTransform before = g2.getTransform();
 		g2.translate(worldX * speedDec, 0.0);
-		int w = image.getWidth(), h = image.getHeight(), hW = -w / 2;
-		int hH = (RESOLUTION_HEIGHT - h) - pos;
-		int xP = hW + (int) (Math.round((worldX - w) / w) * w);
-		int xN = hW + (int) (Math.round(worldX / w) * w);
-		int xA = hW + (int) (Math.round((worldX + w) / w) * w);
-		g2.drawImage(image, xP, hH, w, h, null);
-		g2.drawImage(image, xN, hH, w, h, null);
-		g2.drawImage(image, xA, hH, w, h, null);
+		double w = image.getWidth(), h = image.getHeight(), hW = -w / 2.0;
+		double hH = ((double) RESOLUTION_HEIGHT - h) - pos;
+
+		AffineTransform xT = new AffineTransform();
+		xT.translate(hW + (Math.round((worldX - (worldX * speedDec)) / w) * w) - w, hH);
+
+		g2.drawImage(image, xT, null);
+		xT.translate(w, 0.0);
+		g2.drawImage(image, xT, null);
+		xT.translate(w, 0.0);
+		g2.drawImage(image, xT, null);
 		g2.setTransform(before);
 	}
 
