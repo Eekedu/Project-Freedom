@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Iterator;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static ca.eekedu.Project_Freedom.DrawingFrame.mouseX;
 import static ca.eekedu.Project_Freedom.DrawingFrame.mouseY;
@@ -29,7 +30,7 @@ public class GraphicsGame extends JPanel {
 	/**
 	 * Variables
 	 */
-	float scale;
+	float scaleX, scaleY;
 	JScrollPane inventory;
 	JPanel inventoryPanel = new JPanel();
 	double worldX = 0, worldY = 0;
@@ -40,9 +41,11 @@ public class GraphicsGame extends JPanel {
 	 * Read the image for the background
 	 */
 	GraphicsGame(){
-		setForeground(new Color(0, 0, 0));
+		setForeground(Color.BLACK);
+		setBackground(Color.BLACK);
 		try {
 			backdrop = ImageIO.read(new File("images/background/city.png"));
+			addRandomVines(backdrop);
 			ground = ImageIO.read(new File("images/background/ground.png"));
 			wheel = ImageIO.read(new File("images/sprites/wheel.png"));
 		} catch (Exception e){
@@ -63,7 +66,7 @@ public class GraphicsGame extends JPanel {
 		inventoryPanel = new JPanel() {
 			protected void paintComponent(Graphics g) {
 				Graphics2D g2 = (Graphics2D) g;
-				g2.scale(scale, scale);
+				g2.scale(scaleX, scaleY);
 				Font font = new Font("Serif", Font.PLAIN, 18);
 				g2.setFont(font);
 				g2.fillRect(0, 0, 419, 22);
@@ -128,14 +131,34 @@ public class GraphicsGame extends JPanel {
 		repaint();
 	}
 
+	public void addRandomVines(BufferedImage image) {
+		for (int y = 0; y < image.getHeight(); y++) {
+			for (int x = 0; x < image.getWidth(); x++) {
+				if (ThreadLocalRandom.current().nextInt(0, 100000) < 2) {
+					if (image.getRGB(x, y) < new Color(10, 10, 10).getRGB()) {
+						int size = ThreadLocalRandom.current().nextInt(1, 50) + y;
+						for (int startY = y; startY < size && startY < image.getHeight(); startY++) {
+							x += ThreadLocalRandom.current().nextInt(-500, 500) / 250;
+							if (x > 0 && x < image.getWidth()) {
+								image.setRGB(x, startY, new Color(0, 55, 0).getRGB());
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * Scale the graphics context by the resolution
 	 */
 	public void scale(){
 		if (RESOLUTION_HEIGHT != 0) {
-			scale = (RESOLUTION_WIDTH / RESOLUTION_HEIGHT);
+			scaleX = (RESOLUTION_WIDTH / 1080);
+			scaleY = (RESOLUTION_HEIGHT / 720);
 		} else {
-			scale = 1;
+			scaleX = 1F;
+			scaleY = 1F;
 		}
 	}
 
@@ -146,7 +169,7 @@ public class GraphicsGame extends JPanel {
 	 */
 	protected void render(Graphics2D g, SimulationBody body) {
 		// draw the object
-		body.render(g, scale, body.color);
+		body.render(g, scaleX / scaleY, body.color);
 	}
 
 	/**
@@ -156,13 +179,13 @@ public class GraphicsGame extends JPanel {
 	protected void paintComponent(Graphics g){
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
-		g2.scale(scale, scale);
+		g2.scale(scaleX, scaleY);
 		//g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		Font font = new Font("Serif", Font.PLAIN, 18);
 		g2.setFont(font);
 		AffineTransform t = g2.getTransform();
 		double transY = 0;
-		Transform charBodyTrans = charBody.getTransform();
+		Transform charBodyTrans = characterBody.getTransform();
 		Transform floorTrans = floor.getTransform();
 
 		worldX = charBodyTrans.getTranslationX() - floorTrans.getTranslationX();
@@ -171,12 +194,17 @@ public class GraphicsGame extends JPanel {
 		if (charBodyTrans.getTranslationY() < RESOLUTION_HEIGHT / 2) {
 			transY = -charBodyTrans.getTranslationY() + (RESOLUTION_HEIGHT / 2);
 		}
+		GradientPaint gr = new GradientPaint(RESOLUTION_WIDTH / 2, (int) transY - RESOLUTION_HEIGHT * 2, Color.BLACK,
+				RESOLUTION_WIDTH / 2, RESOLUTION_HEIGHT + (int) transY, new Color(39, 86, 108));
+		g2.setPaint(gr);
+		g2.fillRect(0, (int) transY + (-RESOLUTION_HEIGHT * 2), RESOLUTION_WIDTH, RESOLUTION_HEIGHT * 3);
 		g2.translate(-charBodyTrans.getTranslationX() + (RESOLUTION_WIDTH / 2), transY);
 		if (ground != null) {
-			drawBackground(g2, backdrop, 40.0, 0.50);
 			drawBackground(g2, backdrop, 10.0, 0.75);
+			drawBackground(g2, backdrop, 40.0, 0.50);
 			drawBackground(g2, ground, -72.0, 0.0);
 		}
+
 		for (int i = 0; i < world.getBodyCount(); i++) {
 			SimulationBody body = (SimulationBody) world.getBody(i);
 			render(g2, body);
@@ -228,8 +256,7 @@ public class GraphicsGame extends JPanel {
 		double hH = ((double) RESOLUTION_HEIGHT - h) - pos;
 
 		AffineTransform xT = new AffineTransform();
-		xT.translate(hW + (Math.round((worldX - (worldX * speedDec)) / w) * w) - w, hH);
-
+		xT.translate(hW + (Math.round((worldX - (worldX * speedDec)) / w) * w) - w - (w * speedDec), hH);
 		g2.drawImage(image, xT, null);
 		xT.translate(w, 0.0);
 		g2.drawImage(image, xT, null);

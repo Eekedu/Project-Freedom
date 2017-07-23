@@ -107,9 +107,9 @@ public class SimulationBody extends Body {
      */
     public void render(Graphics2D g, double scale, Color color) {
 
-	    if (!(this.equals(charBody) || this.getMass().getType() == MassType.INFINITE)) {
+	    if (!(this.equals(characterBody) || this.getMass().getType() == MassType.INFINITE)) {
 		    Transform f = this.getTransform();
-		    Transform c = charBody.getTransform();
+		    Transform c = characterBody.getTransform();
 		    Vector2 diff = f.getTranslation().difference(c.getTranslation());
 		    if (!(diff.x < 1500 && diff.x > -1500)) {
 			    if (this.isActive()) {

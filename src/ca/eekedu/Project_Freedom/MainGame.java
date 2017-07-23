@@ -1,11 +1,11 @@
 package ca.eekedu.Project_Freedom;
 
 /**
- * Version: Alpha 0.3.6-1
+ * Version: Alpha 0.3.7
  * Made by Brettink (brett_wad_12@hotmail.com)
  *      Classes include: MainGame, GraphicsGame, DrawingFrame, GraphicsDrawing,
- DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject)
- Classes modified to fit project parameters: SimulationBody, Graphics2DRenderer
+ *      DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject), AudioFile
+ Classes modified to fit project parameters: SimulationBody, Graphics2DRenderer, Player (and jlme library)
 */
 
 import org.dyn4j.collision.AxisAlignedBounds;
@@ -27,9 +27,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Rectangle2D;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
@@ -38,21 +42,20 @@ public class MainGame extends JFrame implements Runnable {
 	/**
 	 * All the variables needed to run the program
 	 */
-
-	public static HashMap<Integer, Integer> keysPressed = new HashMap<>();
-	public static MainGame mainGame = null;
-	public static GraphicsGame graphics = new GraphicsGame();
-	public static KeyBinds keybinds = new KeyBinds();
-	public static Drawings drawingsList = new Drawings();
-	public static GAMEMODE mode = GAMEMODE.Game;
-	public static DRAWMODE drawMode = DRAWMODE.Line;
-	public static DrawingFrame draw = null;
-	public static DrawHelperFrame dHelper = null;
-	public static Color drawColor = Color.RED;
-	public static int drawingCount = 0;
+	static HashMap<Integer, Integer> keysPressed = new HashMap<>();
+	static MainGame mainGame = null;
+	static GraphicsGame graphics = new GraphicsGame();
+	static KeyBinds keybinds = new KeyBinds();
+	static Drawings drawingsList = new Drawings();
+	static GAMEMODE mode = GAMEMODE.Game;
+	static DRAWMODE drawMode = DRAWMODE.Line;
+	static DrawingFrame draw = null;
+	static DrawHelperFrame dHelper = null;
+	static Color drawColor = Color.RED;
+	static int drawingCount = 0;
 	static Timer update = new Timer(0, null);
 	static World world = new World();
-	static SimulationBody charBody = new SimulationBody(new Color(145, 145, 145));
+	static SimulationBody characterBody = new SimulationBody(new Color(145, 145, 145));
 	static int RESOLUTION_WIDTH = 1080;
 	static int RESOLUTION_HEIGHT = 720;
 	static int SYSTEM_RES_WIDTH = 0;
@@ -63,6 +66,7 @@ public class MainGame extends JFrame implements Runnable {
 	static TreeMap<Long, SimulationBody> floorNoEnd = new TreeMap<>();
 	static AxisAlignedBounds bounds;
 	static int P_RESOLUTION_HEIGHT = 720;
+	public AudioPlaylist musicPlaylist;
 	int P_RESOLUTION_WIDTH = 1080;
 
 	/**
@@ -155,16 +159,22 @@ public class MainGame extends JFrame implements Runnable {
 							double x = Double.parseDouble(xF.getText().trim());
 							double y = Double.parseDouble(yF.getText().trim());
 							if (x <= 5000 | y <= 512) {
-								double xBef = charBody.getTransform().getTranslationX();
-								charBody.setLocation(x, y);
-								double xDiff = charBody.getTransform().getTranslationX() - xBef;
+								double xBef = characterBody.getTransform().getTranslationX();
+								characterBody.setLocation(x, y);
+								double xDiff = characterBody.getTransform().getTranslationX() - xBef;
 								if (xDiff > 2000.00 || xDiff < -2000.00) {
 									populate_Floor();
 								}
-								charBody.setAsleep(false);
+								characterBody.setAsleep(false);
 							}
 						}
 					} catch (Exception e2) {
+					}
+				} else if (e.getKeyCode() == KeyEvent.VK_PAGE_DOWN && musicPlaylist != null) {
+					try {
+						musicPlaylist.stopNext();
+					} catch (Exception e2) {
+						e2.printStackTrace();
 					}
 				}
 			}
@@ -187,31 +197,31 @@ public class MainGame extends JFrame implements Runnable {
 		charFixture.setFriction(1.0);
 		charFixture.setRestitution(0.0);
 
-		charBody.addFixture(charFixture, new Point(100,100));
-		charBody.setMass(new Mass(new Vector2(0.0, 0.0), 25.0, 1.0));
-		charBody.setAutoSleepingEnabled(true);
-		charBody.setAngularDamping(0.1);
-		charBody.setLinearDamping(0.05);
-		charBody.setLocation(0.0, 0.0);
-		charBody.setTexture(graphics.wheel, new Rectangle2D.Double(-(charBody.width / 2), -(charBody.height / 2)
-				, charBody.width, charBody.height));
+		characterBody.addFixture(charFixture, new Point(100, 100));
+		characterBody.setMass(new Mass(new Vector2(0.0, 0.0), 25.0, 1.0));
+		characterBody.setAutoSleepingEnabled(true);
+		characterBody.setAngularDamping(0.1);
+		characterBody.setLinearDamping(0.05);
+		characterBody.setLocation(0.0, 0.0);
+		characterBody.setTexture(graphics.wheel, new Rectangle2D.Double(-(characterBody.width / 2), -(characterBody.height / 2)
+				, characterBody.width, characterBody.height));
 
 		floor.addFixture(new Rectangle(RESOLUTION_WIDTH, 50.0));
 		floor.setMass(MassType.INFINITE);
 
 		populate_Floor();
 
-		SimulationBody rando = new SimulationBody(Color.BLUE.darker());
-		rando.setLocation(20.0, 20.0);
+		SimulationBody randomBody = new SimulationBody(Color.BLUE.darker());
+		randomBody.setLocation(20.0, 20.0);
 		BodyFixture f = new BodyFixture(new Rectangle(200.0, 50.0));
 		f.setDensity(1.0);
 		f.setFriction(1.0);
-		rando.addFixture(f);
-		rando.setMass(new Mass(new Vector2(0.0, 0.0), 500.0, 0.0));
-		rando.setAutoSleepingEnabled(true);
-		rando.setAngularDamping(1.0);
-		rando.setLinearDamping(0.0);
-		rando.setAutoSleepingEnabled(true);
+		randomBody.addFixture(f);
+		randomBody.setMass(new Mass(new Vector2(0.0, 0.0), 500.0, 0.0));
+		randomBody.setAutoSleepingEnabled(true);
+		randomBody.setAngularDamping(1.0);
+		randomBody.setLinearDamping(0.0);
+		randomBody.setAutoSleepingEnabled(true);
 		world.addListener(new BoundsListener() {
 			@Override
 			public <E extends Collidable<T>, T extends Fixture> void outside(E e) {
@@ -222,12 +232,21 @@ public class MainGame extends JFrame implements Runnable {
 			}
 		});
 
-		world.addBody(charBody);
-		world.addBody(rando);
+		world.addBody(characterBody);
+		world.addBody(randomBody);
 		world.addBody(floor);
 		world.addBody(floorNoEnd.get((long) -RESOLUTION_WIDTH / 10));
 		world.addBody(floorNoEnd.get(0L));
 		world.addBody(floorNoEnd.get((long) RESOLUTION_WIDTH / 10));
+		try {
+			musicPlaylist = new AudioPlaylist(AudioPlaylist.LOOPTYPE.REPEATALL);
+			Stream<Path> paths = Files.walk(Paths.get("music/"));
+			paths.filter(Files::isRegularFile).filter(p -> p.toString().contains(".mp3"))
+					.forEach(p -> musicPlaylist.add("music/" + p.getFileName().toString()));
+			musicPlaylist.play();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		positionWindowAndSize();
 	}
@@ -290,7 +309,7 @@ public class MainGame extends JFrame implements Runnable {
 							"Minor error", JOptionPane.PLAIN_MESSAGE);
 				}
 
-				bounds.translate(new Vector2(charBody.getChangeInPosition().x, 0.0));
+				bounds.translate(new Vector2(characterBody.getChangeInPosition().x, 0.0));
 				world.update(1.0, 0.05);
 				graphics.update();
 
@@ -330,23 +349,23 @@ public class MainGame extends JFrame implements Runnable {
 		for (Integer key : keysPressed.keySet()) {
 			if (key.equals(keybinds.get("CHAR_JUMP"))) {
 				if (mode.equals(GAMEMODE.Game)) {
-					if (!charBody.getInContactBodies(false).isEmpty()) {
-						charBody.applyImpulse(new Vector2(charBody.getLinearVelocity().x * 1000, -75000.0));
+					if (!characterBody.getInContactBodies(false).isEmpty()) {
+						characterBody.applyImpulse(new Vector2(characterBody.getLinearVelocity().x * 1000, -75000.0));
 					}
 				}
 			}
 			if (key.equals(keybinds.get("MOUSE_UP")) && pressed) mouseRobot.mouseMove(mouseX, mouseY - 1);
 			mousePos();
 			if (key.equals(keybinds.get("CHAR_DOWN")))
-				if (mode.equals(GAMEMODE.Game)) charBody.applyImpulse(new Vector2(0.0, 20.0));
+				if (mode.equals(GAMEMODE.Game)) characterBody.applyImpulse(new Vector2(0.0, 20.0));
 				else if (pressed) mouseRobot.mouseMove(mouseX, mouseY + 1);
 			mousePos();
 			if (key.equals(keybinds.get("CHAR_LEFT")))
-				if (mode.equals(GAMEMODE.Game)) charBody.applyForce(new Vector2(-500.0, 0));
+				if (mode.equals(GAMEMODE.Game)) characterBody.applyForce(new Vector2(-500.0, 0));
 				else if (pressed) mouseRobot.mouseMove(mouseX - 1, mouseY);
 			mousePos();
 			if (key.equals(keybinds.get("CHAR_RIGHT")))
-				if (mode.equals(GAMEMODE.Game)) charBody.applyForce(new Vector2(500.0, 0));
+				if (mode.equals(GAMEMODE.Game)) characterBody.applyForce(new Vector2(500.0, 0));
 				else if (pressed) mouseRobot.mouseMove(mouseX + 1, mouseY);
 			mousePos();
 		}
