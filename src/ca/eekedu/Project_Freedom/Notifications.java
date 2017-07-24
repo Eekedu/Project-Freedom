@@ -31,63 +31,68 @@ public class Notifications {
 	}
 
 	public boolean drawAllNotifications(Graphics2D g) {
-		AffineTransform previous = g.getTransform();
-		if (!notificationList.isEmpty()) {
-			TreeMap<Integer, Map.Entry<Integer, Notification>> toDelete = new TreeMap<>();
-			double offset = 0;
-			Font prev = g.getFont();
-			Font font = new Font("Serif", Font.BOLD, 14);
-			g.setFont(font);
-			g.translate(4.0, -20.0);
-			for (Map.Entry<Integer, Notification> entry : notificationList.entrySet()) {
-				Notification notification = entry.getValue();
-				if (!(notification.currentAge > 1000) || notification.isMovingOpp) {
-					notification.currentAge++;
-					g.translate(0.0, 50 + (notification.curYOffset - 50) + offset);
-					g.setColor(notification.type.getBackgroundColor());
-					FontMetrics fm = g.getFontMetrics();
-					int width = fm.stringWidth(notification.message);
-					boolean resize = false;
-					if (width > 350) {
-						resize = true;
-						width += 50;
-					}
-					g.fillRoundRect(0, 0, (resize) ? width : 400, 50, 25, 25);
-					g.setColor(Color.BLACK);
-					Stroke oldStroke = g.getStroke();
-					g.setStroke(new BasicStroke(4.0F));
-					g.drawRoundRect(0, 0, (resize) ? width : 400, 50, 25, 25);
-					g.setStroke(oldStroke);
-					g.drawImage(icon[notification.type.type], 5, 9, 32, 32, null);
-					g.setColor(notification.type.getForegroundColor());
-					g.drawString(notification.timeOfCreation.toString(), 40.0F, 20.0F);
-					g.drawString(notification.message, 40.0F, 40.0F);
-					if (notification.isMoving) {
-						notification.curYOffset += .75;
-						if (notification.curYOffset > 49) {
-							notification.curYOffset = 50;
-							notification.isMoving = false;
+		try {
+			AffineTransform previous = g.getTransform();
+			if (!notificationList.isEmpty()) {
+				TreeMap<Integer, Map.Entry<Integer, Notification>> toDelete = new TreeMap<>();
+				double offset = 0;
+				Font prev = g.getFont();
+				Font font = new Font("Serif", Font.BOLD, 14);
+				g.setFont(font);
+				g.translate(4.0, -20.0);
+				for (Map.Entry<Integer, Notification> entry : notificationList.entrySet()) {
+					Notification notification = entry.getValue();
+					if (!(notification.currentAge > 1000) || notification.isMovingOpp) {
+						notification.currentAge++;
+						g.translate(0.0, 50 + (notification.curYOffset - 50) + offset);
+						g.setColor(notification.type.getBackgroundColor());
+						FontMetrics fm = g.getFontMetrics();
+						int width = fm.stringWidth(notification.message);
+						boolean resize = false;
+						if (width > 350) {
+							resize = true;
+							width += 50;
 						}
-					} else if (notification.isMovingOpp) {
-						notification.curYOffset -= .75;
-						if (notification.curYOffset < 0) {
-							toDelete.put(toDelete.size() + 1, entry);
+						g.fillRoundRect(0, 0, (resize) ? width : 400, 50, 25, 25);
+						g.setColor(Color.BLACK);
+						Stroke oldStroke = g.getStroke();
+						g.setStroke(new BasicStroke(4.0F));
+						g.drawRoundRect(0, 0, (resize) ? width : 400, 50, 25, 25);
+						g.setStroke(oldStroke);
+						g.drawImage(icon[notification.type.type], 5, 9, 32, 32, null);
+						g.setColor(notification.type.getForegroundColor());
+						g.drawString(notification.timeOfCreation.toString(), 40.0F, 20.0F);
+						g.drawString(notification.message, 40.0F, 40.0F);
+						if (notification.isMoving) {
+							notification.curYOffset += .75;
+							if (notification.curYOffset > 49) {
+								notification.curYOffset = 50;
+								notification.isMoving = false;
+							}
+						} else if (notification.isMovingOpp) {
+							notification.curYOffset -= .75;
+							if (notification.curYOffset < 0) {
+								toDelete.put(toDelete.size() + 1, entry);
+							}
 						}
+						offset = 5;
+					} else {
+						notification.isMovingOpp = true;
 					}
-					offset = 5;
-				} else {
-					notification.isMovingOpp = true;
 				}
+				for (Map.Entry<Integer, Notification> entry : toDelete.values()) {
+					notificationList.remove(entry.getKey(), entry.getValue());
+				}
+				g.setFont(prev);
+			} else {
+				return false;
 			}
-			for (Map.Entry<Integer, Notification> entry : toDelete.values()) {
-				notificationList.remove(entry.getKey(), entry.getValue());
-			}
-			g.setFont(prev);
-		} else {
-			return false;
+			g.setTransform(previous);
+			return true;
+		} catch (Exception e) {
+			addNotification("Minor Notification hiccup", NOTIFICATION_TYPE.ERROR);
 		}
-		g.setTransform(previous);
-		return true;
+		return false;
 	}
 
 	enum NOTIFICATION_TYPE {

@@ -1,7 +1,7 @@
 package ca.eekedu.Project_Freedom;
 
 /**
- * Version: Alpha 0.3.8
+ * Version: Alpha 0.3.8-2
  * Made by Brettink (brett_wad_12@hotmail.com)
  *      Classes include: MainGame, GraphicsGame, DrawingFrame (GraphicsDrawing class embedded),
  *      DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject classes embedded),
@@ -26,6 +26,7 @@ import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -66,7 +67,7 @@ public class MainGame extends JFrame implements Runnable {
 	static TreeMap<Long, SimulationBody> floorNoEnd = new TreeMap<>();
 	static AxisAlignedBounds bounds;
 	static int P_RESOLUTION_HEIGHT = 720;
-	public AudioPlaylist musicPlaylist;
+	static AudioPlaylist musicPlaylist;
 	int P_RESOLUTION_WIDTH = 1080;
 
 	/**
@@ -101,6 +102,30 @@ public class MainGame extends JFrame implements Runnable {
 						e.getKeyCode() == keybinds.get("CHAR_LEFT") || e.getKeyCode() == keybinds.get("CHAR_RIGHT")){
 					if (keysPressed.containsKey(e.getKeyCode())){
 						keysPressed.remove(e.getKeyCode(), 0);
+					}
+				} else if (keysPressed.containsKey(KeyEvent.VK_SHIFT)) {
+					if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+						float gain = (float) (Math.exp((musicPlaylist.volume * Math.log(10.0)) / 20.0));
+						if (gain > 0.025) {
+							gain -= 0.025;
+							double a = (Math.log(gain) / Math.log(10.0) * 20.0);
+							BigDecimal newVol = new BigDecimal(a);
+							float ne = newVol.setScale(1, BigDecimal.ROUND_HALF_EVEN).floatValue();
+							musicPlaylist.setVolume(ne);
+							notificationHandler.addNotification("Volume decreased to: " + (int) (gain * 100),
+									Notifications.NOTIFICATION_TYPE.INFORMATION);
+						}
+					} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+						float gain = (float) (Math.exp((musicPlaylist.volume * Math.log(10.0)) / 20.0));
+						if (gain < 0.975) {
+							gain += 0.025;
+							double a = (Math.log(gain) / Math.log(10.0) * 20.0);
+							BigDecimal newVol = new BigDecimal(a);
+							float ne = newVol.setScale(1, BigDecimal.ROUND_HALF_EVEN).floatValue();
+							musicPlaylist.setVolume(ne);
+							notificationHandler.addNotification("Volume increased to: " + (int) (gain * 100),
+									Notifications.NOTIFICATION_TYPE.INFORMATION);
+						}
 					}
 				}
 			}
@@ -251,7 +276,7 @@ public class MainGame extends JFrame implements Runnable {
 		world.addBody(floorNoEnd.get(0L));
 		world.addBody(floorNoEnd.get((long) RESOLUTION_WIDTH / 10));
 		try {
-			musicPlaylist = new AudioPlaylist(AudioPlaylist.LOOPTYPE.REPEATALL);
+			musicPlaylist = new AudioPlaylist(AudioPlaylist.LOOPTYPE.REPEATALL, -5.0F);
 			Stream<Path> paths = Files.walk(Paths.get("music/"));
 			paths.filter(Files::isRegularFile).filter(p -> p.toString().contains(".mp3"))
 					.forEach(p -> musicPlaylist.add("music/" + p.getFileName().toString()));
@@ -259,7 +284,6 @@ public class MainGame extends JFrame implements Runnable {
 		} catch (Exception e) {
 			notificationHandler.addNotification("Error loading music", Notifications.NOTIFICATION_TYPE.ERROR);
 		}
-
 		positionWindowAndSize();
 	}
 
@@ -343,13 +367,16 @@ public class MainGame extends JFrame implements Runnable {
 					refresh(newObjects);
 				}
 			}
-			checkControls();
+			if (!keysPressed.isEmpty()) {
+				checkControls();
+			}
 		};
 
 		update = new Timer(5, updateTimer); //Smooth update of graphics, reduced lag
 		update.start();
 		Thread r = new Thread(mainGame);
 		r.setDaemon(true);
+		r.start();
 	}
 
 	/**

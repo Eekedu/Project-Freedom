@@ -40,14 +40,15 @@ public class Player {
 	private static SourceDataLine line;
 	private static BitStream bitstream;
 	public volatile boolean playable = true;
+	public volatile float volume = 0.0F;
 	//Runtime rt = null;
 
 
-	public Player(InputStream stream) throws Exception {
+	public Player(InputStream stream, float volume) throws Exception {
 		bitstream = new BitStream(stream);
+		this.volume = volume;
 		//rt = Runtime.getRuntime();
 	}
-
 
 	public static void startOutput(AudioFormat playFormat) throws LineUnavailableException {
 		DataLine.Info info = new DataLine.Info(SourceDataLine.class, playFormat);
@@ -59,7 +60,6 @@ public class Player {
 		line.open(playFormat);
 		line.start();
 	}
-
 
 	public static void stopOutput() {
 		if (line != null) {
@@ -78,6 +78,10 @@ public class Player {
 		System.out.println("            mp3url  : MP3 URL to play");
 	}
 
+	public void setVolume(float volume) {
+		this.volume = volume;
+	}
+
 	public void play() throws Exception {
 		int length;
 		Header header = bitstream.readFrame();
@@ -89,6 +93,12 @@ public class Player {
 				length = output.size();
 				if (length == 0) break;
 				//{
+				if (line.isRunning()) {
+					FloatControl control = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+					if (control != null) {
+						control.setValue(volume);
+					}
+				}
 				line.write(output.getBuffer(), 0, length);
 				bitstream.closeFrame();
 				header = bitstream.readFrame();

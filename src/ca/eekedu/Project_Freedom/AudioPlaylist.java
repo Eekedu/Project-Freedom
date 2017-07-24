@@ -12,6 +12,7 @@ public class AudioPlaylist {
 
 	public static volatile boolean canPlay = false, isPlaying = false;
 	public LOOPTYPE loopType = LOOPTYPE.NOREPEAT;
+	public volatile float volume = 0.0F;
 	private Thread localThread;
 	private Player musicPlayer;
 	private TreeMap<Integer, File> musicFiles = new TreeMap<>();
@@ -20,8 +21,9 @@ public class AudioPlaylist {
 	AudioPlaylist() {
 	}
 
-	AudioPlaylist(LOOPTYPE loopType) throws Exception {
+	AudioPlaylist(LOOPTYPE loopType, float volume) throws Exception {
 		this.loopType = loopType;
+		this.volume = volume;
 	}
 
 	public boolean add(String fileName) {
@@ -48,7 +50,7 @@ public class AudioPlaylist {
 				Runnable r = () -> {
 						try {
 							do {
-								musicPlayer = new Player(new FileInputStream(musicFiles.get(currentTrack)));
+								musicPlayer = new Player(new FileInputStream(musicFiles.get(currentTrack)), volume);
 								isPlaying = true;
 								notificationHandler.addNotification("Now playing: " + musicFiles.get(currentTrack).getName(),
 										Notifications.NOTIFICATION_TYPE.INFORMATION);
@@ -77,6 +79,13 @@ public class AudioPlaylist {
 			return false;
 		}
 		return true;
+	}
+
+	public void setVolume(float volume) {
+		this.volume = volume;
+		if (musicPlayer.playable) {
+			musicPlayer.setVolume(volume);
+		}
 	}
 
 	public void stopNext() throws Exception {
