@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.TreeMap;
 
+import static ca.eekedu.Project_Freedom.MainGame.notificationHandler;
+
 public class AudioPlaylist {
 
 	public static volatile boolean canPlay = false, isPlaying = false;
@@ -43,13 +45,13 @@ public class AudioPlaylist {
 		if (!musicFiles.isEmpty()) {
 			canPlay = true;
 			try {
-				Runnable r = new Runnable() {
-					@Override
-					public void run() {
+				Runnable r = () -> {
 						try {
 							do {
 								musicPlayer = new Player(new FileInputStream(musicFiles.get(currentTrack)));
 								isPlaying = true;
+								notificationHandler.addNotification("Now playing: " + musicFiles.get(currentTrack).getName(),
+										Notifications.NOTIFICATION_TYPE.INFORMATION);
 								musicPlayer.play();
 								isPlaying = false;
 								if (loopType.equals(LOOPTYPE.REPEATALL)) {
@@ -60,15 +62,18 @@ public class AudioPlaylist {
 							e.printStackTrace();
 							return;
 						}
-					}
 				};
 				localThread = new Thread(r);
-				localThread.setDaemon(true);
+				//localThread.setDaemon(true);
 				localThread.start();
 			} catch (Exception e) {
+				notificationHandler.addNotification("An Error has occurred while trying to play a song",
+						Notifications.NOTIFICATION_TYPE.ERROR);
 				return false;
 			}
 		} else {
+			notificationHandler.addNotification("No music to play in the music folder",
+					Notifications.NOTIFICATION_TYPE.ERROR);
 			return false;
 		}
 		return true;

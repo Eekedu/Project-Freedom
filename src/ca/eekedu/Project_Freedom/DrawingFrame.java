@@ -25,9 +25,9 @@ public class DrawingFrame extends JFrame implements Runnable{
 	public static boolean center = false;
 	public static boolean colorPick = false;
 	public static DIRECTION dir = DIRECTION.None;
-	public static GraphicsDrawing drawer = new GraphicsDrawing();
 	public static Robot mouseRobot = null;
 	public static TreeMap<Integer, DrawObject> drawObjects = new TreeMap<>();
+	public GraphicsDrawing drawer = new GraphicsDrawing();
 	public boolean refreshMe = false;
 	public boolean doEdit = false;
 	public int curDrawingIndex = 0;
@@ -264,6 +264,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 			public void mouseDragged(MouseEvent e) {
 				mousePos();
 				if (drawMode.equals(DRAWMODE.FreeDraw)) {
+					mousePos();
+					mousePos();
 					DrawObject object = new DrawObject(drawMode, new Point(startX, startY), new Point(mouseX, mouseY), drawColor);
 					drawObjects.put((!drawObjects.isEmpty()) ? drawObjects.lastEntry().getKey() + 1 : 0, object);
 					drawer.update();
@@ -381,6 +383,12 @@ public class DrawingFrame extends JFrame implements Runnable{
 									"Enter a name for your drawing, cancel to resume drawing",
 									"Name your drawing", JOptionPane.QUESTION_MESSAGE);
 						} while (name.equals(""));
+						try {
+							if (Integer.parseInt(name) > 9000) {
+								notificationHandler.addNotification("It's over 9000!!!!", Notifications.NOTIFICATION_TYPE.ERROR);
+							}
+						} catch (Exception e) {
+						}
 					} else if (save == JOptionPane.NO_OPTION) {
 						exitCode = 1;
 						name = null;
@@ -397,9 +405,11 @@ public class DrawingFrame extends JFrame implements Runnable{
 					Drawing drawing = new Drawing(name, screenshot, drawObjects);
 					if (doEdit) {
 						drawingsList.replace(curDrawingIndex, drawing);
+						notificationHandler.addNotification("Edited drawing: " + name, Notifications.NOTIFICATION_TYPE.NORMAL);
 					} else {
 						drawingsList.put(drawingCount, drawing);
 						drawingCount++;
+						notificationHandler.addNotification("Added drawing: " + name, Notifications.NOTIFICATION_TYPE.NORMAL);
 					}
 				} else {
 					exitCode -= 1;
@@ -417,5 +427,65 @@ public class DrawingFrame extends JFrame implements Runnable{
 	}
 
 	public enum DIRECTION {None, NE, NW, SE, SW}
+
+	public class GraphicsDrawing extends JPanel {
+
+		GraphicsDrawing() {
+			setOpaque(false);
+			setBackground(new Color(255, 255, 255, 1));
+		}
+
+		public void update() {
+			repaint();
+		}
+
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			drawObjects(g);
+		}
+
+		public void drawObjects(Graphics g) {
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setColor(new Color(255, 0, 0));
+			g2.drawRect(0, 0, SYSTEM_MAXDRAW_WIDTH - 1, SYSTEM_MAXDRAW_HEIGHT - 1);
+			for (DrawObject object : drawObjects.values()) {
+				g2.setColor(object.color);
+				switch (object.type) {
+					case Line:
+					case FreeDraw:
+						g2.drawLine(object.position.x, object.position.y, object.size.x, object.size.y);
+						break;
+					case EmptyRect:
+						Draw(g2, 'R', object.position, object.size, false);
+						break;
+					case FilledRect:
+						Draw(g2, 'R', object.position, object.size, true);
+						break;
+					case Oval:
+						Draw(g2, 'O', object.position, object.size, false);
+						break;
+					case FilledOval:
+						Draw(g2, 'O', object.position, object.size, true);
+						break;
+				}
+			}
+		}
+
+		public void Draw(Graphics2D g2, char type, Point start, Point size, boolean filled) {
+			switch (type) {
+				case 'R': {
+					if (filled) g2.fillRect(start.x, start.y, size.x, size.y);
+					else g2.drawRect(start.x, start.y, size.x, size.y);
+					break;
+				}
+				case 'O': {
+					if (filled) g2.fillOval(start.x, start.y, size.x, size.y);
+					else g2.drawOval(start.x, start.y, size.x, size.y);
+					break;
+				}
+			}
+		}
+
+	}
 
 }

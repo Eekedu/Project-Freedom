@@ -1,10 +1,11 @@
 package ca.eekedu.Project_Freedom;
 
 /**
- * Version: Alpha 0.3.7
+ * Version: Alpha 0.3.8
  * Made by Brettink (brett_wad_12@hotmail.com)
- *      Classes include: MainGame, GraphicsGame, DrawingFrame, GraphicsDrawing,
- *      DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject), AudioFile
+ *      Classes include: MainGame, GraphicsGame, DrawingFrame (GraphicsDrawing class embedded),
+ *      DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject classes embedded),
+ *      AudioFile, Notifications (Notification class embedded)
  Classes modified to fit project parameters: SimulationBody, Graphics2DRenderer, Player (and jlme library)
 */
 
@@ -23,9 +24,7 @@ import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +38,7 @@ import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
 public class MainGame extends JFrame implements Runnable {
 
+	public static volatile Notifications notificationHandler;
 	/**
 	 * All the variables needed to run the program
 	 */
@@ -74,10 +74,20 @@ public class MainGame extends JFrame implements Runnable {
 	 * @throws AWTException
 	 */
 	MainGame() throws AWTException {
-
+		try {
+			notificationHandler = new Notifications();
+		} catch (Exception msg) {
+			JOptionPane.showMessageDialog(this,
+					"Notifications could not be setup\n" + msg.getMessage());
+		}
 		setTitle("Project Freedom");
 		setUndecorated(true);
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				stopAll();
+			}
+		});
 		addKeyListener(new KeyListener() {
 
 			public void keyTyped(KeyEvent e) {}
@@ -100,8 +110,7 @@ public class MainGame extends JFrame implements Runnable {
 					keysPressed.put(e.getKeyCode(), 0);
 				}
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
-					update.stop();
-					dispose();
+					stopAll();
 				} else if (keysPressed.containsKey(KeyEvent.VK_SHIFT) && graphics.inventory == null) {
 					if (e.getKeyCode() == keybinds.get("SIZE_UP")){
 						if (RESOLUTION_WIDTH != 1280) {
@@ -128,7 +137,8 @@ public class MainGame extends JFrame implements Runnable {
 					try {
 						doDraw(-1);
 					} catch (Exception e1) {
-						System.out.println("Ooops Something went wrong!");
+						notificationHandler.addNotification("An error has occurred trying to open the drawing window",
+								Notifications.NOTIFICATION_TYPE.ERROR);
 
 					}
 				} else if (e.getKeyCode() == keybinds.get("INVENT_B")){
@@ -169,6 +179,8 @@ public class MainGame extends JFrame implements Runnable {
 							}
 						}
 					} catch (Exception e2) {
+						notificationHandler.addNotification("You must enter proper coordinates",
+								Notifications.NOTIFICATION_TYPE.INFORMATION);
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_PAGE_DOWN && musicPlaylist != null) {
 					try {
@@ -245,7 +257,7 @@ public class MainGame extends JFrame implements Runnable {
 					.forEach(p -> musicPlaylist.add("music/" + p.getFileName().toString()));
 			musicPlaylist.play();
 		} catch (Exception e) {
-			e.printStackTrace();
+			notificationHandler.addNotification("Error loading music", Notifications.NOTIFICATION_TYPE.ERROR);
 		}
 
 		positionWindowAndSize();
@@ -300,46 +312,44 @@ public class MainGame extends JFrame implements Runnable {
 		SYSTEM_MAXDRAW_WIDTH = window.width;
 		SYSTEM_MAXDRAW_HEIGHT = window.height;
 		mainGame = new MainGame();
-
 		ActionListener updateTimer = e -> {
-			{
-				if (!mainGame.isVisible() && update.isRunning()) {
-					mainGame.setVisible(true);
-					JOptionPane.showMessageDialog(mainGame, "Game window had a problem starting right away",
-							"Minor error", JOptionPane.PLAIN_MESSAGE);
-				}
-
-				bounds.translate(new Vector2(characterBody.getChangeInPosition().x, 0.0));
-				world.update(1.0, 0.05);
-				graphics.update();
-
-				if (mode.equals(GAMEMODE.Game)) {
-					mainGame.requestFocus();
-				}
-
-				if (draw != null) {
-					if (!draw.isVisible()) {
-						dHelper = null;
-						draw = null;
-					} else if (draw.refreshMe) {
-						dHelper.dispose();
-						dHelper = null;
-						draw.dispose();
-						draw.refreshMe = false;
-						TreeMap<Integer, Drawings.Drawing.DrawObject> newObjects = new TreeMap<>();
-						for (Drawings.Drawing.DrawObject object : drawObjects.values()) {
-							newObjects.put(newObjects.size(), object);
-						}
-						refresh(newObjects);
-					}
-				}
-				checkControls();
+			if (!mainGame.isVisible() && update.isRunning()) {
+				mainGame.setVisible(true);
+				JOptionPane.showMessageDialog(mainGame, "Game window had a problem starting right away",
+						"Minor error", JOptionPane.PLAIN_MESSAGE);
 			}
+
+			bounds.translate(new Vector2(characterBody.getChangeInPosition().x, 0.0));
+			world.update(1.0, 0.05);
+			graphics.update();
+
+			if (mode.equals(GAMEMODE.Game)) {
+				mainGame.requestFocus();
+			}
+
+			if (draw != null) {
+				if (!draw.isVisible()) {
+					dHelper = null;
+					draw = null;
+				} else if (draw.refreshMe) {
+					dHelper.dispose();
+					dHelper = null;
+					draw.dispose();
+					draw.refreshMe = false;
+					TreeMap<Integer, Drawings.Drawing.DrawObject> newObjects = new TreeMap<>();
+					for (Drawings.Drawing.DrawObject object : drawObjects.values()) {
+						newObjects.put(newObjects.size(), object);
+					}
+					refresh(newObjects);
+				}
+			}
+			checkControls();
 		};
 
 		update = new Timer(5, updateTimer); //Smooth update of graphics, reduced lag
 		update.start();
-
+		Thread r = new Thread(mainGame);
+		r.setDaemon(true);
 	}
 
 	/**
@@ -350,7 +360,7 @@ public class MainGame extends JFrame implements Runnable {
 			if (key.equals(keybinds.get("CHAR_JUMP"))) {
 				if (mode.equals(GAMEMODE.Game)) {
 					if (!characterBody.getInContactBodies(false).isEmpty()) {
-						characterBody.applyImpulse(new Vector2(characterBody.getLinearVelocity().x * 1000, -75000.0));
+						characterBody.applyForce(new Vector2(0.0, -75000.0));
 					}
 				}
 			}
@@ -388,6 +398,15 @@ public class MainGame extends JFrame implements Runnable {
 			world.addBody(floor_M100);
 			floorNoEnd.put((floorNoEnd.firstKey() - 108), floor_M100);
 		}
+	}
+
+	public void stopAll() {
+		if (musicPlaylist != null) {
+			musicPlaylist.loopType = AudioPlaylist.LOOPTYPE.NOREPEAT;
+			musicPlaylist.stop();
+		}
+		update.stop();
+		dispose();
 	}
 
 	/**

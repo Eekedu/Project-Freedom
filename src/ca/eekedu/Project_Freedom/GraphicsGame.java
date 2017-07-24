@@ -210,7 +210,7 @@ public class GraphicsGame extends JPanel {
 			render(g2, body);
 		}
 		g2.setTransform(t);
-
+		notificationHandler.drawAllNotifications(g2);
 		g2.setColor(new Color(0, 0, 0));
 		g2.fillRect(0, 0, getWidth(), 23);
 		g2.setColor(new Color(255, 255, 255));
@@ -349,6 +349,8 @@ public class GraphicsGame extends JPanel {
 						break;
 					}
 					case 'd': {
+						notificationHandler.addNotification("Removed drawing: " + drawingsList.get(pos).drawingName,
+								Notifications.NOTIFICATION_TYPE.NORMAL);
 						drawingsList.remove(pos);
 						remove(inventory);
 						inventory = null;
