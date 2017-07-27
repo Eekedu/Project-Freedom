@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.HashMap;
 
+import static ca.eekedu.Project_Freedom.MainGame.notificationHandler;
+
 public class KeyBinds extends HashMap<String, Integer> {
 
 	KeyBinds() {
@@ -13,7 +15,10 @@ public class KeyBinds extends HashMap<String, Integer> {
 		if (!keybinds.exists()){
 			try {
 				populate_defaults(keybinds);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				notificationHandler.addNotification("Can't create or read keybinds.cfg! - " +
+						e.getMessage(), Notifications.NOTIFICATION_TYPE.ERROR);
+			}
 		}
 		read(keybinds);
 	}
@@ -82,7 +87,8 @@ public class KeyBinds extends HashMap<String, Integer> {
 				populate_defaults(keybinds);
 				read(keybinds);
 			} catch (Exception e1) {
-				System.out.println(e1.getMessage());
+				notificationHandler.addNotification("Can't create or read keybinds.cfg! - " +
+						e.getMessage(), Notifications.NOTIFICATION_TYPE.ERROR);
 			}
 		}
 	}

@@ -30,7 +30,8 @@ public class AudioPlaylist {
 		try {
 			musicFiles.put((!musicFiles.isEmpty()) ? musicFiles.lastKey() + 1 : 0, new File(fileName));
 		} catch (Exception e) {
-			e.printStackTrace();
+			notificationHandler.addNotification("Could not add (" + fileName + ") to music list - " +
+					e.getMessage(), Notifications.NOTIFICATION_TYPE.ERROR);
 		}
 		return true;
 	}
@@ -61,7 +62,6 @@ public class AudioPlaylist {
 								}
 							} while (!loopType.equals(LOOPTYPE.NOREPEAT) && canPlay);
 						} catch (Exception e) {
-							e.printStackTrace();
 							return;
 						}
 				};
@@ -69,13 +69,13 @@ public class AudioPlaylist {
 				//localThread.setDaemon(true);
 				localThread.start();
 			} catch (Exception e) {
-				notificationHandler.addNotification("An Error has occurred while trying to play a song",
-						Notifications.NOTIFICATION_TYPE.ERROR);
+				notificationHandler.addNotification("An Error has occurred while trying to play a song -" +
+						e.getMessage(), Notifications.NOTIFICATION_TYPE.ERROR);
 				return false;
 			}
 		} else {
 			notificationHandler.addNotification("No music to play in the music folder",
-					Notifications.NOTIFICATION_TYPE.ERROR);
+					Notifications.NOTIFICATION_TYPE.INFORMATION);
 			return false;
 		}
 		return true;

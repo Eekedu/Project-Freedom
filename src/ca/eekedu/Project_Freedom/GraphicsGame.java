@@ -34,7 +34,7 @@ public class GraphicsGame extends JPanel {
 	JScrollPane inventory;
 	JPanel inventoryPanel = new JPanel();
 	double worldX = 0, worldY = 0;
-	BufferedImage backdrop, ground, wheel;
+	BufferedImage backdrop, ground, wheel, wood;
 
 	/**
 	 * Main constructor
@@ -48,7 +48,10 @@ public class GraphicsGame extends JPanel {
 			addRandomVines(backdrop);
 			ground = ImageIO.read(new File("images/background/ground.png"));
 			wheel = ImageIO.read(new File("images/sprites/wheel.png"));
+			wood = ImageIO.read(new File("images/textures/wood.jpg"));
 		} catch (Exception e){
+			notificationHandler.addNotification("Could not load images for graphics - " +
+					e.getMessage(), Notifications.NOTIFICATION_TYPE.ERROR);
 		}
 	}
 
@@ -362,7 +365,8 @@ public class GraphicsGame extends JPanel {
 				}
 
 			} catch (Exception e1) {
-				System.out.println("Something went wrong!");
+				notificationHandler.addNotification("Something happened with the button listener! -" +
+						e1.getMessage(), Notifications.NOTIFICATION_TYPE.ERROR);
 			}
 		}
 	}

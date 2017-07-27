@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static ca.eekedu.Project_Freedom.MainGame.logger;
+
 public class Notifications {
 
 	private TreeMap<Integer, Notification> notificationList = new TreeMap<>();
@@ -20,14 +22,22 @@ public class Notifications {
 		icon[2] = ImageIO.read(new File("images/icons/notification/inf.png"));
 	}
 
-	public boolean addNotification(String message, NOTIFICATION_TYPE type) {
+	public void addNotification(String message, NOTIFICATION_TYPE type) {
 		try {
 			notificationList.put((!notificationList.isEmpty()) ? notificationList.lastKey() + 1 : 0,
 					new Notification(message, type));
+			switch (type) {
+				case INFORMATION:
+				case NORMAL:
+					logger.info(message);
+					break;
+				case ERROR:
+					logger.error(message);
+					break;
+			}
 		} catch (Exception e) {
-			return false;
+			logger.error(e.getMessage());
 		}
-		return true;
 	}
 
 	public boolean drawAllNotifications(Graphics2D g) {
@@ -42,8 +52,11 @@ public class Notifications {
 				g.translate(4.0, -20.0);
 				for (Map.Entry<Integer, Notification> entry : notificationList.entrySet()) {
 					Notification notification = entry.getValue();
-					if (!(notification.currentAge > 1000) || notification.isMovingOpp) {
+					if (!(notification.currentAge >= 1000) || notification.isMovingOpp) {
 						notification.currentAge++;
+						if (notification.currentAge >= 1000) {
+							notification.isMovingOpp = true;
+						}
 						g.translate(0.0, 50 + (notification.curYOffset - 50) + offset);
 						g.setColor(notification.type.getBackgroundColor());
 						FontMetrics fm = g.getFontMetrics();
@@ -59,18 +72,18 @@ public class Notifications {
 						g.setStroke(new BasicStroke(4.0F));
 						g.drawRoundRect(0, 0, (resize) ? width : 400, 50, 25, 25);
 						g.setStroke(oldStroke);
-						g.drawImage(icon[notification.type.type], 5, 9, 32, 32, null);
+						g.drawImage(icon[notification.type.index], 5, 9, 32, 32, null);
 						g.setColor(notification.type.getForegroundColor());
 						g.drawString(notification.timeOfCreation.toString(), 40.0F, 20.0F);
 						g.drawString(notification.message, 40.0F, 40.0F);
 						if (notification.isMoving) {
-							notification.curYOffset += .75;
+							notification.curYOffset += 0.75;
 							if (notification.curYOffset > 49) {
 								notification.curYOffset = 50;
 								notification.isMoving = false;
 							}
 						} else if (notification.isMovingOpp) {
-							notification.curYOffset -= .75;
+							notification.curYOffset -= 0.75;
 							if (notification.curYOffset < 0) {
 								toDelete.put(toDelete.size() + 1, entry);
 							}
@@ -90,20 +103,20 @@ public class Notifications {
 			g.setTransform(previous);
 			return true;
 		} catch (Exception e) {
-			addNotification("Minor Notification hiccup", NOTIFICATION_TYPE.ERROR);
+			addNotification("Minor Notification hiccup - " + e.getMessage(), NOTIFICATION_TYPE.ERROR);
 		}
 		return false;
 	}
 
 	enum NOTIFICATION_TYPE {
 		ERROR(0), NORMAL(1), INFORMATION(2);
-		int type = 0;
+		int index = 0;
 		private Color backgroundColor;
 		private Color foregroundColor;
 
-		NOTIFICATION_TYPE(int type) {
-			this.type = type;
-			switch (this.type) {
+		NOTIFICATION_TYPE(int index) {
+			this.index = index;
+			switch (this.index) {
 				case 0:
 					this.backgroundColor = new Color(80, 80, 80, 160);
 					foregroundColor = Color.RED;

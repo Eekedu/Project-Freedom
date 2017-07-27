@@ -50,8 +50,9 @@ public class SimulationBody extends Body {
         this.color = color;
     }
 
-	public void setTexture(BufferedImage texture, Rectangle2D bounds) {
-		this.texture = new TexturePaint(texture, bounds);
+	public void setTexture(BufferedImage texture) {
+		Rectangle2D size = new Rectangle2D.Double(-width / 2, -height / 2, width, height);
+		this.texture = new TexturePaint(texture, size);
 	}
 
 	public Body addFixture(BodyFixture fixture, Point size) {

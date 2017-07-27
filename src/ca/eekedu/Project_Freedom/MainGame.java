@@ -1,14 +1,16 @@
 package ca.eekedu.Project_Freedom;
 
 /**
- * Version: Alpha 0.3.8-2
+ * Version: Alpha 0.3.9
  * Made by Brettink (brett_wad_12@hotmail.com)
  *      Classes include: MainGame, GraphicsGame, DrawingFrame (GraphicsDrawing class embedded),
  *      DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject classes embedded),
  *      AudioFile, Notifications (Notification class embedded)
- Classes modified to fit project parameters: SimulationBody, Graphics2DRenderer, Player (and jlme library)
+ Classes modified to fit project parameters: SimulationBody, Graphics2DRenderer, Player (from jlme library)
 */
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dyn4j.collision.AxisAlignedBounds;
 import org.dyn4j.collision.BoundsListener;
 import org.dyn4j.collision.Collidable;
@@ -18,6 +20,7 @@ import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.dynamics.Settings;
 import org.dyn4j.dynamics.World;
 import org.dyn4j.geometry.*;
+import org.dyn4j.geometry.Polygon;
 import org.dyn4j.geometry.Rectangle;
 
 import javax.swing.*;
@@ -25,7 +28,6 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Rectangle2D;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +41,7 @@ import static ca.eekedu.Project_Freedom.DrawingFrame.*;
 
 public class MainGame extends JFrame implements Runnable {
 
+	final static Logger logger = LogManager.getLogger(MainGame.class.getName());
 	public static volatile Notifications notificationHandler;
 	/**
 	 * All the variables needed to run the program
@@ -80,6 +83,7 @@ public class MainGame extends JFrame implements Runnable {
 		} catch (Exception msg) {
 			JOptionPane.showMessageDialog(this,
 					"Notifications could not be setup\n" + msg.getMessage());
+			logger.error(msg.getMessage());
 		}
 		setTitle("Project Freedom");
 		setUndecorated(true);
@@ -162,8 +166,8 @@ public class MainGame extends JFrame implements Runnable {
 					try {
 						doDraw(-1);
 					} catch (Exception e1) {
-						notificationHandler.addNotification("An error has occurred trying to open the drawing window",
-								Notifications.NOTIFICATION_TYPE.ERROR);
+						notificationHandler.addNotification("An error has occurred trying to open the drawing window - "
+								+ e1.getMessage(), Notifications.NOTIFICATION_TYPE.ERROR);
 
 					}
 				} else if (e.getKeyCode() == keybinds.get("INVENT_B")){
@@ -211,7 +215,8 @@ public class MainGame extends JFrame implements Runnable {
 					try {
 						musicPlaylist.stopNext();
 					} catch (Exception e2) {
-						e2.printStackTrace();
+						notificationHandler.addNotification("Could not play next music file - " + e2.getMessage(),
+								Notifications.NOTIFICATION_TYPE.ERROR);
 					}
 				}
 			}
@@ -235,13 +240,12 @@ public class MainGame extends JFrame implements Runnable {
 		charFixture.setRestitution(0.0);
 
 		characterBody.addFixture(charFixture, new Point(100, 100));
-		characterBody.setMass(new Mass(new Vector2(0.0, 0.0), 25.0, 1.0));
+		characterBody.setMass(new Mass(new Vector2(0.0, 0.0), 25.0, 10000.0));
 		characterBody.setAutoSleepingEnabled(true);
 		characterBody.setAngularDamping(0.1);
 		characterBody.setLinearDamping(0.05);
 		characterBody.setLocation(0.0, 0.0);
-		characterBody.setTexture(graphics.wheel, new Rectangle2D.Double(-(characterBody.width / 2), -(characterBody.height / 2)
-				, characterBody.width, characterBody.height));
+		characterBody.setTexture(graphics.wheel);
 
 		floor.addFixture(new Rectangle(RESOLUTION_WIDTH, 50.0));
 		floor.setMass(MassType.INFINITE);
@@ -249,16 +253,21 @@ public class MainGame extends JFrame implements Runnable {
 		populate_Floor();
 
 		SimulationBody randomBody = new SimulationBody(Color.BLUE.darker());
-		randomBody.setLocation(20.0, 20.0);
-		BodyFixture f = new BodyFixture(new Rectangle(200.0, 50.0));
+		randomBody.setLocation(20.0, 40.0);
+		Vector2[] vertices = new Vector2[3];
+		vertices[0] = new Vector2(600.0, 0.0);
+		vertices[1] = new Vector2(600.0, 400.0);
+		vertices[2] = new Vector2(0.0, 400.0);
+		BodyFixture f = new BodyFixture(new Polygon(vertices));
 		f.setDensity(1.0);
-		f.setFriction(1.0);
-		randomBody.addFixture(f);
-		randomBody.setMass(new Mass(new Vector2(0.0, 0.0), 500.0, 0.0));
+		f.setFriction(0.5);
+		randomBody.addFixture(f, new Point(250, 250));
+		randomBody.setMass(new Mass(new Vector2(0.0, 0.0), 500.0, 1000));
+		randomBody.updateMass();
 		randomBody.setAutoSleepingEnabled(true);
-		randomBody.setAngularDamping(1.0);
+		randomBody.setAngularDamping(0.0);
 		randomBody.setLinearDamping(0.0);
-		randomBody.setAutoSleepingEnabled(true);
+		randomBody.setTexture(graphics.wood);
 		world.addListener(new BoundsListener() {
 			@Override
 			public <E extends Collidable<T>, T extends Fixture> void outside(E e) {
@@ -276,13 +285,14 @@ public class MainGame extends JFrame implements Runnable {
 		world.addBody(floorNoEnd.get(0L));
 		world.addBody(floorNoEnd.get((long) RESOLUTION_WIDTH / 10));
 		try {
-			musicPlaylist = new AudioPlaylist(AudioPlaylist.LOOPTYPE.REPEATALL, -5.0F);
+			musicPlaylist = new AudioPlaylist(AudioPlaylist.LOOPTYPE.REPEATALL, -2.5F);
 			Stream<Path> paths = Files.walk(Paths.get("music/"));
 			paths.filter(Files::isRegularFile).filter(p -> p.toString().contains(".mp3"))
 					.forEach(p -> musicPlaylist.add("music/" + p.getFileName().toString()));
 			musicPlaylist.play();
 		} catch (Exception e) {
-			notificationHandler.addNotification("Error loading music", Notifications.NOTIFICATION_TYPE.ERROR);
+			notificationHandler.addNotification("Error loading music - " + e.getMessage(),
+					Notifications.NOTIFICATION_TYPE.ERROR);
 		}
 		positionWindowAndSize();
 	}

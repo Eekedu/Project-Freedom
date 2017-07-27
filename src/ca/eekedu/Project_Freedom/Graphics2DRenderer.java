@@ -95,9 +95,6 @@ public final class Graphics2DRenderer {
         // fill the shape
 	    if (!(g.getPaint() instanceof TexturePaint)) g.setColor(color);
 	    g.fill(c);
-        // draw the outline
-        g.setColor(getOutlineColor(color));
-        g.draw(c);
 
         // draw a line so that rotation is visible
         /*Line2D.Double l = new Line2D.Double(
@@ -131,9 +128,6 @@ public final class Graphics2DRenderer {
         // fill the shape
 	    if (!(g.getPaint() instanceof TexturePaint)) g.setColor(color);
 	    g.fill(p);
-        // draw the outline
-        g.setColor(getOutlineColor(color));
-        g.draw(p);
     }
 
     /**
@@ -154,8 +148,8 @@ public final class Graphics2DRenderer {
                 vertices[1].y * scale);
 
         // draw the outline
-        g.setColor(getOutlineColor(color));
-        g.draw(l);
+	    g.setColor(color);
+	    g.draw(l);
     }
 
     /**
@@ -209,10 +203,6 @@ public final class Graphics2DRenderer {
 	    if (!(g.getPaint() instanceof TexturePaint)) g.setColor(color);
 	    // fill the shape
         g.fill(path);
-        // set the color
-        g.setColor(getOutlineColor(color));
-        // draw the shape
-        g.draw(path);
 
         // re-instate the old transform
         g.setTransform(oTransform);
@@ -247,9 +237,6 @@ public final class Graphics2DRenderer {
         // fill the shape
 	    if (!(g.getPaint() instanceof TexturePaint)) g.setColor(color);
 	    g.fill(c);
-        // draw the outline
-        g.setColor(getOutlineColor(color));
-        g.draw(c);
 
         // re-instate the old transform
         g.setTransform(oTransform);
@@ -290,9 +277,6 @@ public final class Graphics2DRenderer {
         // fill the shape
 	    if (!(g.getPaint() instanceof TexturePaint)) g.setColor(color);
 	    g.fill(a);
-        // draw the outline
-        g.setColor(getOutlineColor(color));
-        g.draw(a);
 
         // re-instate the old transform
         g.setTransform(oTransform);
@@ -334,22 +318,8 @@ public final class Graphics2DRenderer {
         // fill the shape
 	    if (!(g.getPaint() instanceof TexturePaint)) g.setColor(color);
 	    g.fill(a);
-        // draw the outline
-        g.setColor(getOutlineColor(color));
-        g.draw(a);
 
         // re-instate the old transform
         g.setTransform(oTransform);
-    }
-
-    /**
-     * Returns the outline color for the given color.
-     *
-     * @param color the fill color
-     * @return Color
-     */
-    private static final Color getOutlineColor(Color color) {
-        Color oc = color.darker();
-        return new Color(oc.getRed(), oc.getGreen(), oc.getBlue(), color.getAlpha());
     }
 }

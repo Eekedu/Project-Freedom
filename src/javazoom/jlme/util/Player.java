@@ -70,14 +70,6 @@ public class Player {
 		}
 	}
 
-	private static void usage() {
-		System.out.println("Usage : ");
-		System.out.println("       java javazoom.jlme.util.Player [mp3file] [-url mp3url]");
-		System.out.println("");
-		System.out.println("            mp3file : MP3 filename to play");
-		System.out.println("            mp3url  : MP3 URL to play");
-	}
-
 	public void setVolume(float volume) {
 		this.volume = volume;
 	}

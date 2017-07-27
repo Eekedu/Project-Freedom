@@ -423,6 +423,8 @@ public class DrawingFrame extends JFrame implements Runnable{
 				mainGame.requestFocus();
 			}
 		} catch (Exception e) {
+			notificationHandler.addNotification("Something very wrong happened! - " + e.getMessage(),
+					Notifications.NOTIFICATION_TYPE.ERROR);
 		}
 	}
 
