@@ -1,7 +1,7 @@
 package ca.eekedu.Project_Freedom;
 
 /**
- * Version: Alpha 0.3.9
+ * Version: Alpha 0.3.9-2
  * Made by Brettink (brett_wad_12@hotmail.com)
  *      Classes include: MainGame, GraphicsGame, DrawingFrame (GraphicsDrawing class embedded),
  *      DrawHelperFrame, KeyBinds, Drawings (Drawing, and DrawObject classes embedded),
@@ -438,8 +438,8 @@ public class MainGame extends JFrame implements Runnable {
 	}
 
 	public void stopAll() {
-		if (musicPlaylist != null) {
-			musicPlaylist.loopType = AudioPlaylist.LOOPTYPE.NOREPEAT;
+        if (musicPlaylist != null && musicPlaylist.isFilled()) {
+            musicPlaylist.loopType = AudioPlaylist.LOOPTYPE.NOREPEAT;
 			musicPlaylist.stop();
 		}
 		update.stop();

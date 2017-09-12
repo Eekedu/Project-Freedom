@@ -101,6 +101,10 @@ public class AudioPlaylist {
 		return isPlaying;
 	}
 
+    public boolean isFilled() {
+        return (!musicFiles.isEmpty());
+    }
+
 	public enum LOOPTYPE {
 		NOREPEAT, REPEAT, REPEATALL
 	}

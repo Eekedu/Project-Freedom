@@ -150,38 +150,42 @@ public class DrawingFrame extends JFrame implements Runnable{
 							startY - (dHelper.getHeight() / 2);
 					mouseRobot.mouseMove(newMouseX, newMouseY);
 					mousePos();
-				} else if (e.getKeyCode() == keybinds.get("SELECT_O")) {
-					if (!pressed && !center){
-						if (!drawObjects.isEmpty()) {
-							int minDistance = 1000000000;
-							Point newPos = new Point(0, 0);
-							DrawObject obj = new DrawObject();
-							for (DrawObject object: drawObjects.values()){
-								if (!object.type.equals(DRAWMODE.FreeDraw)) {
-									Point center = new Point(object.size.x - ((object.size.x - object.position.x) / 2),
-											object.size.y - ((object.size.y - object.position.y) / 2));
-									if (center.distance(mouseX, mouseY) < minDistance) {
-										minDistance = (int) center.distance(mouseX, mouseY);
-										newPos = new Point(center.x, center.y);
-										obj = object;
-									}
-								}
-							}
-							int mouseMod = (keybinds.get("MOUSE_P") - 1) * 2;
-							if (mouseMod == 0) mouseMod = 1;
-							mouseRobot.mouseRelease(16 / mouseMod);
-							mouseRobot.mouseMove(newPos.x, newPos.y);
-							drawColor = obj.color;
-							drawMode = obj.type;
-							dHelper.setLocation(obj.position);
-							dHelper.setSize(Math.abs(obj.size.x - obj.position.x), Math.abs(obj.size.y - obj.position.y));
-							pressed = true;
-							center = true;
-							dir = DIRECTION.SE;
-							mousePos();
-						}
-					}
-				}
+                } else if (e.getKeyCode() == keybinds.get("SELECT_O")) {
+                    if (!pressed && !center){
+                        if (!drawObjects.isEmpty()) {
+                            int minDistance = 1000000000;
+                            Point newPos = new Point(0, 0);
+                            DrawObject obj = new DrawObject();
+                            for (DrawObject object: drawObjects.values()){
+                                if (!object.type.equals(DRAWMODE.FreeDraw)) {
+                                    Point center = new Point(object.size.x - ((object.size.x - object.position.x) / 2),
+                                            object.size.y - ((object.size.y - object.position.y) / 2));
+                                    if (center.distance(mouseX, mouseY) < minDistance) {
+                                        minDistance = (int) center.distance(mouseX, mouseY);
+                                        newPos = new Point(center.x, center.y);
+                                        obj = object;
+                                    }
+                                }
+                            }
+                            int mouseMod = (keybinds.get("MOUSE_P") - 1) * 2;
+                            if (mouseMod == 0) mouseMod = 1;
+                            mouseRobot.mouseRelease(16 / mouseMod);
+                            mouseRobot.mouseMove(newPos.x, newPos.y);
+                            drawColor = obj.color;
+                            drawMode = obj.type;
+                            dHelper.setLocation(obj.position);
+                            dHelper.setSize(Math.abs(obj.size.x - obj.position.x), Math.abs(obj.size.y - obj.position.y));
+                            pressed = true;
+                            center = true;
+                            dir = DIRECTION.SE;
+                            mousePos();
+                        }
+                    }
+                } else if (e.getKeyCode() == KeyEvent.VK_9) {
+                    drawMode = drawMode.previous();
+                } else if (e.getKeyCode() == KeyEvent.VK_0) {
+                    drawMode = drawMode.next();
+                }
 			}
 		});
 
